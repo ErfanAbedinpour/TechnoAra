@@ -1,0 +1,56 @@
+version: 2.0.0
+
+services:
+  app:
+    build: 
+      dockerfile: dockerFile
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    depends_on:
+      - psql
+    volumes:
+      - .:/app
+    networks:
+      - app
+    command: ["npm", "run","start:dev"]
+      
+  psql:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_DB=${PG_NAME}
+    ports:
+      - ${PG_PORT}:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - app
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
+      - psql
+    environment:
+      ADMINER_DEFAULT_SERVER: psql
+    ports:
+      - 8080:8080
+    networks:
+      - app
+
+volumes:
+  app:
+  db:
+
+networks:
+  app:
+    driver: bridge
+
+
+
+
