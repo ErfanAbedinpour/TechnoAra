@@ -22,11 +22,13 @@ export const externalImports = [
             const DB_URI = `postgres://${user}:${password}@${host}`
             return {
                 clientUrl: DB_URI,
-                entities: [`${process.cwd()}/dist/models`],
-                entitiesTs: [`${process.cwd()}/src/models`],
+                entities: ['./dist/models'],
+                entitiesTs: ['$./src/models'],
                 port: port,
                 dbName: name,
                 debug: true,
+                baseDir: process.cwd(),
+                autoLoadEntities: true,
                 driver: PostgreSqlDriver,
                 logger: (msg) => logger.debug(msg),
             }

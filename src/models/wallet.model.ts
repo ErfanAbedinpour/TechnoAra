@@ -1,6 +1,7 @@
-import { BaseEntity, Entity, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { Entity, OneToOne, Property, Rel } from "@mikro-orm/core";
 import { User } from "./user.model";
 import Decimal from "decimal.js";
+import { BaseEntity } from "./base.entity";
 
 @Entity({ tableName: "wallets" })
 export class Wallet extends BaseEntity {

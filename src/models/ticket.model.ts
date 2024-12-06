@@ -1,6 +1,7 @@
-import { BaseEntity, Entity, Enum, ManyToMany, ManyToOne, OneToMany, Property, Rel } from "@mikro-orm/core";
+import { Entity, Enum, ManyToMany, ManyToOne, OneToMany, Property, Rel } from "@mikro-orm/core";
 import { v4 } from 'uuid'
 import { User } from "./user.model";
+import { BaseEntity } from "./base.entity";
 
 @Entity({ tableName: 'tickets' })
 export class Ticket extends BaseEntity {

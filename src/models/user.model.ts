@@ -1,10 +1,11 @@
-import { BaseEntity, Cascade, Collection, Entity, ManyToOne, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { Cascade, Collection, Entity, ManyToOne, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
 import { Role, UserRole } from "./role.model";
 import { Profile } from "./profile.model";
 import { Product } from "./product.model";
 import { Ticket } from "./ticket.model";
 import { Address } from "./address.model";
 import { Order } from "./order.model";
+import { BaseEntity } from "./base.entity";
 
 
 

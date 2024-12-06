@@ -1,5 +1,6 @@
-import { BaseEntity, Entity, ManyToOne, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { Entity, ManyToOne, OneToOne, Property, Rel } from "@mikro-orm/core";
 import { State } from "./state.model";
+import { BaseEntity } from "./base.entity";
 
 @Entity({ tableName: "cities" })
 export class City extends BaseEntity {

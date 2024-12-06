@@ -1,9 +1,8 @@
-import { BaseEntity, Collection, Entity, Enum, ManyToMany, ManyToOne, Property, Rel } from "@mikro-orm/core";
+import { Collection, Entity, Enum, ManyToMany, ManyToOne, Property, Rel } from "@mikro-orm/core";
 import { User } from "./user.model";
 import { Product } from "./product.model";
-import Decimal from "decimal.js";
-
-
+import { OrderItem } from "./order-item.model";
+import { BaseEntity } from "./base.entity";
 
 
 @Entity({ tableName: "orders" })
@@ -14,11 +13,9 @@ export class Order extends BaseEntity {
     @ManyToOne(() => User, { deleteRule: "set null" })
     user: Rel<User>
 
-    @ManyToMany(() => Product, product => product.orders, { owner: true, nullable: false })
+    @ManyToMany(() => Product, product => product.orders, { pivotEntity: () => OrderItem, owner: true, nullable: false })
     products = new Collection<Product>(this)
 
-    @Property({ type: Decimal, columnType: "numeric(10,2)", nullable: false })
-    titlaPrice!: Decimal
 }
 
 
@@ -28,4 +25,3 @@ export enum OrderStatus {
     Complete = "complete",
     Cancelled = "cancelled",
 }
-
