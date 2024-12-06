@@ -3,6 +3,7 @@ import { Role, UserRole } from "./role.model";
 import { Profile } from "./profile.model";
 import { Product } from "./product.model";
 import { Ticket } from "./ticket.model";
+import { Address } from "./address.model";
 
 
 
@@ -31,4 +32,8 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Ticket, ticket => ticket.user, { cascade: [Cascade.REMOVE] })
     tickets = new Collection<Ticket>(this)
+
+
+    @OneToMany(() => Address, address => address.user)
+    addresses = new Collection<Address>(this)
 }
