@@ -7,7 +7,7 @@ import 'dotenv/config';
 
 const logger = new Logger("MikroOrm")
 
-const DB_URI = `postgres://${process.env.PG_USER}:${process.env.PG_PASSWORD}@localhost`
+const DB_URI = `postgres://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}`
 
 export default defineConfig({
     clientUrl: DB_URI,

@@ -22,9 +22,8 @@ export class User extends BaseEntity {
     @Property({ hidden: true, lazy: true, nullable: false })
     password!: string
 
-    @OneToOne({ entity: () => Role, ref: true, default: UserRole.USER, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default" })
+    @OneToOne({ entity: () => Role, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default" })
     role: Rel<Role>
-
 
     @OneToOne(() => Profile, { fieldName: "profile_id", owner: true, deleteRule: "cascade", updateRule: 'cascade' })
     profile: Rel<Profile>
