@@ -4,6 +4,7 @@ import { Profile } from "./profile.model";
 import { Product } from "./product.model";
 import { Ticket } from "./ticket.model";
 import { Address } from "./address.model";
+import { Order } from "./order.model";
 
 
 
@@ -36,4 +37,7 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Address, address => address.user)
     addresses = new Collection<Address>(this)
+
+    @OneToMany(() => Order, order => order.user)
+    orders = new Collection<Order>(this)
 }

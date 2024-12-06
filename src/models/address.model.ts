@@ -1,9 +1,10 @@
-import { BaseEntity, ManyToOne, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { BaseEntity, Entity, ManyToOne, OneToOne, Property, Rel } from "@mikro-orm/core";
 import { City } from "./city.model";
 import { User } from "./user.model";
 
 
 
+@Entity({ tableName: "addresses" })
 export class Address extends BaseEntity {
 
     @Property()

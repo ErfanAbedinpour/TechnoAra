@@ -4,6 +4,7 @@ import Decimal from "decimal.js";
 import { Category } from "./category.model";
 import { Cart } from "./cart.model";
 import { CartProduct } from "./cart-product.model";
+import { Order } from "./order.model";
 
 
 @Entity({ tableName: "products" })
@@ -27,4 +28,8 @@ export class Product extends BaseEntity {
 
     @ManyToMany(() => Cart, cart => cart.products, { pivotEntity: () => CartProduct, owner: true })
     carts = new Collection<Cart>(this)
+
+    @ManyToMany(() => Order, order => order.products)
+    orders = new Collection<Order>(this)
+
 }
