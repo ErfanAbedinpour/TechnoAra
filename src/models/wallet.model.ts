@@ -5,8 +5,10 @@ import { BaseEntity } from "./base.entity";
 
 @Entity({ tableName: "wallets" })
 export class Wallet extends BaseEntity {
-    @OneToOne(() => User, { fieldName: "user_id", nullable: false })
-    user: Rel<User>
-    @Property({ columnType: "numeric(10,2)", type: () => Decimal, default: 0 })
+
+    @OneToOne({ entity: () => User, fieldName: "user_id", owner: true })
+    user!: Rel<User>
+
+    @Property({ columnType: "numeric(10,2)", type: () => Decimal })
     credit: Decimal
 }
