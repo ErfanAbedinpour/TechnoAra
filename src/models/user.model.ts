@@ -1,4 +1,4 @@
-import { Cascade, Collection, Entity, ManyToOne, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { Cascade, Collection, Entity, ManyToMany, ManyToOne, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
 import { Role, UserRole } from "./role.model";
 import { Profile } from "./profile.model";
 import { Product } from "./product.model";
@@ -6,7 +6,8 @@ import { Ticket } from "./ticket.model";
 import { Address } from "./address.model";
 import { Order } from "./order.model";
 import { BaseEntity } from "./base.entity";
-
+import { Notification } from "./notification.model";
+import { Comment } from "./comment.model";
 
 
 
@@ -40,4 +41,10 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Order, order => order.user)
     orders = new Collection<Order>(this)
+
+    @ManyToMany(() => Notification, notification => notification.users)
+    notifications = new Collection<Notification>(this)
+
+    @OneToMany(() => Comment, comment => comment.user)
+    comments = new Collection<Comment>(this)
 }

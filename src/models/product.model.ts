@@ -1,4 +1,4 @@
-import { Collection, Entity, ManyToMany, ManyToOne, Property, Rel } from "@mikro-orm/core";
+import { Collection, Entity, ManyToMany, ManyToOne, OneToMany, Property, Rel } from "@mikro-orm/core";
 import { User } from "./user.model";
 import Decimal from "decimal.js";
 import { Category } from "./category.model";
@@ -9,6 +9,7 @@ import { OrderItem } from "./order-item.model";
 import { Attribute } from "./attribute.model";
 import { ProductAttribute } from "./product-attribute.model";
 import { BaseEntity } from "./base.entity";
+import { Comment } from "./comment.model";
 
 
 @Entity({ tableName: "products" })
@@ -38,4 +39,8 @@ export class Product extends BaseEntity {
 
     @ManyToMany(() => Attribute, attr => attr.products, { pivotEntity: () => ProductAttribute })
     attributes = new Collection<Attribute>(this)
+
+    @OneToMany(() => Comment, comment => comment.product)
+    comments = new Collection<Comment>(this)
+
 }
