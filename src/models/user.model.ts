@@ -1,4 +1,4 @@
-import { BeforeCreate, Cascade, Collection, Entity, ManyToMany, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { BeforeCreate, Cascade, Collection, Entity, EventArgs, ManyToMany, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
 import { Role } from "./role.model";
 import { Profile } from "./profile.model";
 import { Product } from "./product.model";
@@ -8,11 +8,13 @@ import { Order } from "./order.model";
 import { BaseEntity } from "./base.entity";
 import { Notification } from "./notification.model";
 import { Comment } from "./comment.model";
+import { ArgonService } from "../modules/auth/hashingServices/argon.service";
 
 
 
 @Entity({ tableName: "users" })
 export class User extends BaseEntity {
+    private hashService = new ArgonService()
 
     @Property({ unique: true, nullable: false })
     email!: string
@@ -47,4 +49,11 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Comment, comment => comment.user)
     comments = new Collection<Comment>(this)
+
+    @BeforeCreate()
+    async beforeCreate(args: EventArgs<this>) {
+        args.entity.password = await this.hashService.hash(args.entity.password)
+        args.entity.email = args.entity.email.toLowerCase();
+        return args;
+    }
 }
