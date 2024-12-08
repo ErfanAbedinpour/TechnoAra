@@ -11,6 +11,6 @@ const QueryLogger: ValueProvider = {
 
 
 export const externalImports = [
-    ConfigModule.forRoot({ cache: true, load: [databaseConfig] }),
+    ConfigModule.forRoot({ cache: true, isGlobal: true, load: [databaseConfig] }),
     MikroOrmModule.forRoot(config),
 ]
