@@ -5,10 +5,10 @@ import { User } from "./user.model";
 @Entity({ tableName: 'profiles' })
 export class Profile extends BaseEntity {
     @Property()
-    bio: string
+    bio?: string
 
     @Property()
-    profile: string
+    profile?: string
 
     @OneToOne(() => User)
     user: Rel<User>

@@ -1,5 +1,5 @@
-import { Cascade, Collection, Entity, ManyToMany, ManyToOne, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
-import { Role, UserRole } from "./role.model";
+import { BeforeCreate, Cascade, Collection, Entity, ManyToMany, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { Role } from "./role.model";
 import { Profile } from "./profile.model";
 import { Product } from "./product.model";
 import { Ticket } from "./ticket.model";
@@ -23,11 +23,11 @@ export class User extends BaseEntity {
     @Property({ hidden: true, lazy: true, nullable: false })
     password!: string
 
-    @OneToOne({ entity: () => Role, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default" })
+    @OneToOne({ entity: () => Role, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default", default: 2, unique: false })
     role: Rel<Role>
 
-    @OneToOne(() => Profile, { fieldName: "profile_id", owner: true, deleteRule: "cascade", updateRule: 'cascade' })
-    profile: Rel<Profile>
+    @OneToOne(() => Profile, { fieldName: "profile_id", owner: true, deleteRule: "cascade", updateRule: 'cascade', nullable: true })
+    profile?: Rel<Profile>
 
     @OneToMany(() => Product, (product) => product.user)
     products = new Collection<Product>(this)

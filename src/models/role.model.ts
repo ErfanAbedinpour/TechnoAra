@@ -1,4 +1,4 @@
-import { Entity, Enum, Property } from "@mikro-orm/core";
+import { Entity, Enum } from "@mikro-orm/core";
 import { BaseEntity } from "./base.entity";
 
 
