@@ -1,6 +1,6 @@
 
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
-import { RegisterUserDto } from "./dtos/user.register";
+import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { User } from "../../models/user.model";
 
@@ -16,23 +16,20 @@ export class AuthService {
     ) { }
 
 
-    async register({ email, username, password }: RegisterUserDto) {
-
+    async register({ email, username, password }: RegisterUserDto): Promise<RegisterUserResponse> {
         const isValidEmail = await this.em.findOne(User, {
-            email,
-        }, { populate: ["id", 'email'] })
+            email: email,
+        }, { fields: ["id", "email"] })
 
         if (isValidEmail)
             throw new BadRequestException(this.INVALID_EMAIL)
 
-        const user = new User()
-        user.email = email;
-        user.password = password;
-        user.username = username;
+
+        this.em.create(User, { email, username, password })
 
         try {
-            await this.em.persistAndFlush(user);
-            return true;
+            await this.em.flush();
+            return { success: true }
         } catch (err) {
             this.logger.error(err);
             throw new InternalServerErrorException(err.message);

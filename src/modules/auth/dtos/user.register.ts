@@ -16,3 +16,7 @@ export class RegisterUserDto {
     password: string
 
 }
+
+export class RegisterUserResponse {
+    success: boolean
+}
