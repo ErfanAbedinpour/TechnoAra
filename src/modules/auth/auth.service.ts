@@ -1,8 +1,10 @@
 
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { User } from "../../models/user.model";
+import { UserLoginDto } from "./dtos/user.login";
+import { HashService } from "./hashingServices/hash.service";
 
 
 
@@ -10,13 +12,17 @@ import { User } from "../../models/user.model";
 @Injectable()
 export class AuthService {
     private readonly INVALID_EMAIL = "email is registered by another user."
+    private readonly INVALID_CRENDENTIAL = "email or password incorrect"
     private logger = new Logger(AuthService.name);
     constructor(
-        private readonly em: EntityManager
+        private readonly em: EntityManager,
+        private readonly hashService: HashService
+
     ) { }
 
 
     async register({ email, username, password }: RegisterUserDto): Promise<RegisterUserResponse> {
+
         const isValidEmail = await this.em.findOne(User, {
             email: email,
         }, { fields: ["id", "email"] })
@@ -34,5 +40,15 @@ export class AuthService {
             this.logger.error(err);
             throw new InternalServerErrorException(err.message);
         }
+    }
+
+    async login({ email, password }: UserLoginDto) {
+        const user = await this.em.findOne(User, { email: email }, { populate: ["role.name"], fields: ['password', "role.name", "profile", "email", "username"] })
+
+        if (!user || !(await this.hashService.compare(password, user.password)))
+            throw new BadRequestException(this.INVALID_CRENDENTIAL)
+
+        // generate new token for Authorization
+        return user;
     }
 }
