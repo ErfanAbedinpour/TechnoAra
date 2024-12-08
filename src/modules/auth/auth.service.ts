@@ -3,8 +3,11 @@ import { BadRequestException, Injectable, InternalServerErrorException, Logger, 
 import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { User } from "../../models/user.model";
-import { UserLoginDto } from "./dtos/user.login";
+import { UserLoginDto, UserLoginResponse } from "./dtos/user.login";
 import { HashService } from "./hashingServices/hash.service";
+import { AccessTokenService } from "./jwt/accessToken.service";
+import { RefreshTokenService } from "./jwt/refreshToken.service";
+
 
 
 
@@ -16,7 +19,9 @@ export class AuthService {
     private logger = new Logger(AuthService.name);
     constructor(
         private readonly em: EntityManager,
-        private readonly hashService: HashService
+        private readonly hashService: HashService,
+        private readonly accessTokenService: AccessTokenService,
+        private readonly refreshTokenService: RefreshTokenService
 
     ) { }
 
@@ -42,13 +47,16 @@ export class AuthService {
         }
     }
 
-    async login({ email, password }: UserLoginDto) {
-        const user = await this.em.findOne(User, { email: email }, { populate: ["role.name"], fields: ['password', "role.name", "profile", "email", "username"] })
+    async login({ email, password }: UserLoginDto): Promise<UserLoginResponse> {
+        const user = await this.em.findOne(User, { email: email }, { populate: ["role.name"], fields: ['password', "role", "profile", "email", "username"] })
 
         if (!user || !(await this.hashService.compare(password, user.password)))
             throw new BadRequestException(this.INVALID_CRENDENTIAL)
 
         // generate new token for Authorization
-        return user;
+        const accessToken = await this.accessTokenService.sign(user)
+        const refreshToken = await this.refreshTokenService.sign(user)
+        return { accessToken, refreshToken };
     }
+
 }

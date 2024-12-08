@@ -9,4 +9,7 @@ export class UserLoginDto {
 }
 
 
-export class UserLoginResponse { }
+export class UserLoginResponse {
+    accessToken: string;
+    refreshToken: string;
+}
