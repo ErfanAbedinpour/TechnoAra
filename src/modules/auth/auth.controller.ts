@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
 import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { AuthService } from "./auth.service";
 import { UserLoginDto, UserLoginResponse } from "./dtos/user.login";
 import { RefreshTokenDto, RefreshTokenResponse } from "./dtos/refresh.token.dto";
 import { Auth, AUTH_STRATEGIES } from "./decorator/auth.decorator";
-import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 
 
 
