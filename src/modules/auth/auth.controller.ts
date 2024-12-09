@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestj
 import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { AuthService } from "./auth.service";
 import { UserLoginDto, UserLoginResponse } from "./dtos/user.login";
+import { RefreshTokenDto } from "./dtos/refresh.token.dto";
 
 
 
@@ -21,4 +22,9 @@ export class AuthController {
         return this.service.login(body)
     }
 
+    @Post("/token")
+    @HttpCode(HttpStatus.OK)
+    token(@Body() body: RefreshTokenDto) {
+        return this.service.token(body)
+    }
 }
