@@ -21,7 +21,8 @@
     "prepare": "husky",
     "commitlint": "commitlint --edit",
     "seed": "mikro-orm seeder:run",
-    "migrate": "mikro-orm migration:up"
+    "migrate:up": "mikro-orm migration:up",
+    "migrate:create": "mikro-orm migration:create"
   },
   "mikro-orm": {
     "configPaths": [
