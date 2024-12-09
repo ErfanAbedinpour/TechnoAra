@@ -1,5 +1,6 @@
 import { defineConfig } from "@mikro-orm/core";
 import { EntityGenerator } from "@mikro-orm/entity-generator";
+import { Migrator } from "@mikro-orm/migrations";
 import { PostgreSqlDriver } from "@mikro-orm/postgresql";
 import { Logger } from "@nestjs/common";
 import 'dotenv/config';
@@ -14,18 +15,32 @@ export default defineConfig({
     entities: ['./dist/models/*.model.js'],
     entitiesTs: ['./src/models/*.model.ts'],
     port: +process.env.PG_PORT,
-    extensions: [EntityGenerator],
+    extensions: [EntityGenerator, Migrator],
     dbName: process.env.PG_NAME,
     debug: true,
     baseDir: process.cwd(),
     driver: PostgreSqlDriver,
     logger: (msg) => logger.debug(msg),
     seeder: {
-        path: "./src/seeders", // path to the folde
-        pathTs: "./src/seeders", // path to the folder with TS seeders (if used, we should put path to compiled files in `path`)
-        defaultSeeder: 'DatabaseSeeder', // default seeder class name
-        glob: '!(*.d).{js,ts}', // how to match seeder files (all .js and .ts files, but not .d.ts)
-        emit: 'ts', // seeder generation mode
-        fileName: (className: string) => className, // seeder file naming convention
+        path: "./src/seeders",
+        pathTs: "./src/seeders",
+        defaultSeeder: 'DatabaseSeeder',
+        glob: '!(*.d).{js,ts}',
+        emit: 'ts',
+        fileName: (className: string) => className,
     },
+    migrations: {
+        tableName: 'migrations',
+        path: './dist/migrations',
+        pathTs: "./src/migrations",
+        glob: '!(*.d).{js,ts}',
+        transactional: true,
+        disableForeignKeys: true,
+        allOrNothing: true,
+        dropTables: true,
+        safe: false,
+        snapshot: true,
+        emit: 'ts',
+    },
+
 });
