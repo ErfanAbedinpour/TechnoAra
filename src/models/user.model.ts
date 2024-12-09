@@ -1,6 +1,5 @@
 import { BeforeCreate, Cascade, Collection, Entity, EventArgs, ManyToMany, OneToMany, OneToOne, Property, Rel } from "@mikro-orm/core";
 import { Role } from "./role.model";
-import { Profile } from "./profile.model";
 import { Product } from "./product.model";
 import { Ticket } from "./ticket.model";
 import { Address } from "./address.model";
@@ -27,16 +26,17 @@ export class User extends BaseEntity {
 
     @OneToOne({ entity: () => Role, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default", default: 2, unique: false })
     role: Rel<Role>
-
-    @OneToOne(() => Profile, { fieldName: "profile_id", owner: true, deleteRule: "cascade", updateRule: 'cascade', nullable: true })
-    profile?: Rel<Profile>
-
     @OneToMany(() => Product, (product) => product.user)
     products = new Collection<Product>(this)
 
     @OneToMany(() => Ticket, ticket => ticket.user, { cascade: [Cascade.REMOVE] })
     tickets = new Collection<Ticket>(this)
 
+    @Property({ nullable: true })
+    bio?: string
+
+    @Property({ nullable: true })
+    profile?: string
 
     @OneToMany(() => Address, address => address.user)
     addresses = new Collection<Address>(this)
