@@ -43,7 +43,7 @@ export class AuthService {
             return { success: true }
         } catch (err) {
             this.logger.error(err);
-            throw new InternalServerErrorException(err.message);
+            throw new InternalServerErrorException();
         }
     }
 
@@ -54,9 +54,18 @@ export class AuthService {
             throw new BadRequestException(this.INVALID_CRENDENTIAL)
 
         // generate new token for Authorization
-        const accessToken = await this.accessTokenService.sign(user)
-        const refreshToken = await this.refreshTokenService.sign(user)
-        return { accessToken, refreshToken };
+
+        try {
+            const [accessToken, refreshToken] = await Promise.all([
+                this.accessTokenService.sign(user),
+                this.refreshTokenService.sign(user)
+            ]);
+            return { accessToken, refreshToken };
+        } catch (err) {
+            this.logger.error(err.message)
+            throw new InternalServerErrorException()
+        }
+
     }
 
 }
