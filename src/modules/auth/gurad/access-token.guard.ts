@@ -15,17 +15,16 @@ export class AccessTokenGuard implements CanActivate {
 
         const [bearer, token] = request.headers?.authorization?.split(' ') || [];
 
-        if (!bearer || bearer !== "bearer" || !token)
+        if (!bearer || bearer.toLocaleLowerCase() !== "bearer" || !token)
             throw new UnauthorizedException(this.HEADER_NOT_VALID)
 
         try {
             const paylaod = await this.accessTokenService.verify(token);
             request.user = paylaod;
-
+            return true
         } catch (err) {
             throw new UnauthorizedException(this.INVALID_TOKEN)
         }
-        return true
     }
 }
 

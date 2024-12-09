@@ -10,6 +10,7 @@ export class AuthGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const metas = this.reflector.getAllAndOverride<AUTH_STRATEGIES[]>(AUTH_TOKEN, [context.getHandler(), context.getClass()]) ?? [AUTH_STRATEGIES.BEARER]
+
         for (const meta of metas) {
             if (meta === AUTH_STRATEGIES.BEARER) {
                 try {
@@ -19,6 +20,6 @@ export class AuthGuard implements CanActivate {
                 }
             }
         }
-        return false;
+        return true;
     }
 }
