@@ -5,9 +5,9 @@ import { internalImports } from './import/internal.import';
 @Module({
   imports: [
     ...externalImports,
-    ...internalImports
+    ...internalImports,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }
