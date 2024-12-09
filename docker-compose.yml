@@ -1,8 +1,9 @@
-version: 2.0.0
+version: 4.0.0
 
 services:
   app:
     build: 
+      context: .
       dockerfile: dockerFile
     restart: always
     env_file:
@@ -11,11 +12,25 @@ services:
       - ${PORT}:3000
     depends_on:
       - psql
+      - migration 
     volumes:
       - .:/app
     networks:
       - app
     command: ["npm", "run","start:dev"]
+
+  migration:
+    build:
+      context: .
+      dockerfile: dockerFile
+    restart: no
+    command: npm run migrate
+    networks:
+      - app
+    depends_on:
+      - psql
+    volumes:
+      - .:/app
       
   psql:
     image: postgres
@@ -42,6 +57,8 @@ services:
       - 8080:8080
     networks:
       - app
+  
+
 
   redis:
     image: redis
