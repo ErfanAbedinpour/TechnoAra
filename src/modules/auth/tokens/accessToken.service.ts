@@ -25,14 +25,14 @@ export class AccessTokenService {
         })
     }
 
-    async verify(token: string): Promise<AccessTokenPayload> {
-        return this.jwtService.verifyAsync<AccessTokenPayload>(token, {
+    async verify(token: string): Promise<CurentUser> {
+        return this.jwtService.verifyAsync<CurentUser>(token, {
             secret: this.configuratoin.secret
         })
     }
 }
 
-export class AccessTokenPayload {
+export class CurentUser {
     id: number
     role: string
     username: string
