@@ -12,6 +12,9 @@ import accessTokenConfig from "./config/accessToken.config";
 import refreshTokenConfig from "./config/refreshToken.config";
 import { RefreshTokenService } from "./tokens/refreshToken.service";
 import { UserTokenService } from "./tokens/user.token.service";
+import { APP_GUARD } from "@nestjs/core";
+import { AuthGuard } from "./gurad/auth.guard";
+import { AccessTokenGuard } from "./gurad/access-token.guard";
 
 
 @Module({
@@ -27,7 +30,12 @@ import { UserTokenService } from "./tokens/user.token.service";
         },
         AccessTokenService,
         RefreshTokenService,
-        UserTokenService
+        UserTokenService,
+        AccessTokenGuard,
+        {
+            provide: APP_GUARD,
+            useClass: AuthGuard
+        }
     ],
     controllers: [AuthController],
 })

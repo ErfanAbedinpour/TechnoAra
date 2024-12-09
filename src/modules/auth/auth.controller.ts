@@ -3,9 +3,11 @@ import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { AuthService } from "./auth.service";
 import { UserLoginDto, UserLoginResponse } from "./dtos/user.login";
 import { RefreshTokenDto } from "./dtos/refresh.token.dto";
+import { Auth, AUTH_STRATEGIES } from "./decorator/auth.decorator";
 
 
 
+@Auth(AUTH_STRATEGIES.BEARER)
 @Controller('auth')
 export class AuthController {
     constructor(private readonly service: AuthService) { }
