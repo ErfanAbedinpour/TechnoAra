@@ -7,7 +7,7 @@ import { Auth, AUTH_STRATEGIES } from "./decorator/auth.decorator";
 
 
 
-@Auth(AUTH_STRATEGIES.BEARER)
+@Auth(AUTH_STRATEGIES.NONE)
 @Controller('auth')
 export class AuthController {
     constructor(private readonly service: AuthService) { }
