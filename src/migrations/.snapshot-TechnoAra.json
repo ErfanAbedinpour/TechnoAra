@@ -447,14 +447,25 @@
           "default": "2",
           "mappedType": "integer"
         },
-        "profile_id": {
-          "name": "profile_id",
-          "type": "int",
+        "bio": {
+          "name": "bio",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "integer"
+          "length": 255,
+          "mappedType": "string"
+        },
+        "profile": {
+          "name": "profile",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "users",
@@ -466,16 +477,6 @@
           ],
           "composite": false,
           "keyName": "users_email_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "profile_id"
-          ],
-          "composite": false,
-          "keyName": "users_profile_id_unique",
           "constraint": true,
           "primary": false,
           "unique": true
@@ -504,19 +505,6 @@
           ],
           "referencedTableName": "public.role",
           "deleteRule": "set default",
-          "updateRule": "cascade"
-        },
-        "users_profile_id_foreign": {
-          "constraintName": "users_profile_id_foreign",
-          "columnNames": [
-            "profile_id"
-          ],
-          "localTableName": "public.users",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.profiles",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -650,106 +638,6 @@
             "user_id"
           ],
           "localTableName": "public.tickets",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.users",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": true,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "bigint",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "bigint"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "bigint",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "bigint"
-        },
-        "bio": {
-          "name": "bio",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "profile": {
-          "name": "profile",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
-        }
-      },
-      "name": "profiles",
-      "schema": "public",
-      "indexes": [
-        {
-          "columnNames": [
-            "user_id"
-          ],
-          "composite": false,
-          "keyName": "profiles_user_id_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
-          "keyName": "profiles_pkey",
-          "columnNames": [
-            "id"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "profiles_user_id_foreign": {
-          "constraintName": "profiles_user_id_foreign",
-          "columnNames": [
-            "user_id"
-          ],
-          "localTableName": "public.profiles",
           "referencedColumnNames": [
             "id"
           ],
