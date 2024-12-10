@@ -8,6 +8,7 @@ import { BaseEntity } from "./base.entity";
 import { Notification } from "./notification.model";
 import { Comment } from "./comment.model";
 import { ArgonService } from "../modules/auth/hashingServices/argon.service";
+import { Wallet } from "./wallet.model";
 
 
 
@@ -38,11 +39,17 @@ export class User extends BaseEntity {
     @Property({ nullable: true })
     profile?: string
 
+    @Property({ nullable: true, unique: true })
+    phone: string;
+
     @OneToMany(() => Address, address => address.user)
     addresses = new Collection<Address>(this)
 
     @OneToMany(() => Order, order => order.user)
     orders = new Collection<Order>(this)
+
+    @OneToOne(() => Wallet, { nullable: true })
+    wallet: Rel<Wallet>
 
     @ManyToMany(() => Notification, notification => notification.users)
     notifications = new Collection<Notification>(this)
