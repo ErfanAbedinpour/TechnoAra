@@ -15,11 +15,11 @@ import { UserTokenService } from "./tokens/user.token.service";
 import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./gurad/auth.guard";
 import { AccessTokenGuard } from "./gurad/access-token.guard";
+import { RoleGurad } from "./gurad/role.guard";
 
 
 @Module({
     imports: [
-        MikroOrmModule.forFeature({ entities: [User] }),
         JwtModule.register({}),
         ConfigModule.forRoot({ load: [accessTokenConfig, refreshTokenConfig] }),
     ],
@@ -35,6 +35,10 @@ import { AccessTokenGuard } from "./gurad/access-token.guard";
         {
             provide: APP_GUARD,
             useClass: AuthGuard
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RoleGurad
         }
     ],
     controllers: [AuthController],

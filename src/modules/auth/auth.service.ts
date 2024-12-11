@@ -8,6 +8,8 @@ import { HashService } from "./hashingServices/hash.service";
 import { UserTokenService } from "./tokens/user.token.service";
 import { RefreshTokenDto } from "./dtos/refresh.token.dto";
 import { RefreshTokenService } from "./tokens/refreshToken.service";
+import { Role } from "./decorator/role.decorator";
+import { UserRole } from "../../models/role.model";
 
 
 
@@ -38,13 +40,14 @@ export class AuthService {
         if (isValidEmail)
             throw new BadRequestException(this.INVALID_EMAIL)
 
-
-        this.em.create(User, { email, username, password })
-
         try {
-            await this.em.flush();
+            const defaultUserRole = await this.em.findOne(Role, { name: UserRole.USER });
+            const user = this.em.create(User, { username, email, password, role: defaultUserRole });
+            await this.em.persistAndFlush(user);
             return { success: true }
+
         } catch (err) {
+            console.error(err);
             this.logger.error(err);
             throw new InternalServerErrorException();
         }
