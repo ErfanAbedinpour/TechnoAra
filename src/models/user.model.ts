@@ -25,7 +25,7 @@ export class User extends BaseEntity {
     @Property({ hidden: true, lazy: true, nullable: false })
     password!: string
 
-    @OneToOne({ entity: () => Role, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default", default: 2, unique: false })
+    @OneToOne({ entity: () => Role, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default", unique: false })
     role: Rel<Role>
     @OneToMany(() => Product, (product) => product.user)
     products = new Collection<Product>(this)
