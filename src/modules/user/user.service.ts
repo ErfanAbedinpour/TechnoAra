@@ -4,14 +4,18 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../models/user.model';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Pagination } from '../../types/paggination.type';
+import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response';
 
 @Injectable()
 export class UserService {
-  private USER_NOT_FOUND = "user does not found"
-  constructor(@InjectRepository(User)
-  private readonly userRepository: EntityRepository<User>,) { }
 
-  async findAll({ limit, page }: Pagination) {
+  private USER_NOT_FOUND = "user does not found"
+
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: EntityRepository<User>,) { }
+
+  async findAll({ limit, page }: Pagination): Promise<GetAllUserResponse> {
 
     const offset = limit * (page - 1);
     const [users, countAll] = await this.userRepository.findAndCount({}, { offset, limit });
@@ -28,7 +32,7 @@ export class UserService {
   }
 
   // find user by id 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<GetOneUserResponse> {
     const user = await this.userRepository.findOne({ id }, {
       populate: ["*"],
     })
@@ -36,7 +40,7 @@ export class UserService {
     if (!user)
       throw new BadRequestException(this.USER_NOT_FOUND)
 
-    return user;
+    return { user };
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
