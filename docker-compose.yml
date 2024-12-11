@@ -1,4 +1,4 @@
-version: 4.0.0
+version: '4.2.0'
 
 services:
   app:
@@ -12,7 +12,6 @@ services:
       - ${PORT}:3000
     depends_on:
       - psql
-      - migration 
     volumes:
       - .:/app
     networks:
@@ -23,14 +22,27 @@ services:
     build:
       context: .
       dockerfile: dockerFile
-    restart: no
-    command: npm run migrate
+    restart: "no"
+    command: sh -c "npm run migrate:create && npm run migrate:up"
     networks:
       - app
     depends_on:
       - psql
     volumes:
       - .:/app
+  seed:
+    build:
+      context: .
+      dockerfile: dockerFile
+    restart: "no"
+    command: "npm run seed"
+    networks:
+      - app
+    depends_on:
+      - psql
+    volumes:
+      - .:/app
+
       
   psql:
     image: postgres
