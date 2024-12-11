@@ -24,6 +24,8 @@ services:
       dockerfile: dockerFile
     restart: "no"
     command: sh -c "npm run migrate:create && npm run migrate:up"
+    profiles:
+      - migration
     networks:
       - app
     depends_on:
@@ -34,6 +36,8 @@ services:
     build:
       context: .
       dockerfile: dockerFile
+    profiles:
+      - seed
     restart: "no"
     command: "npm run seed"
     networks:
