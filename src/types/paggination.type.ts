@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsNotEmpty, Min } from "class-validator";
 
-export class Paggination {
+export class Pagination {
     @IsNotEmpty({ message: "please enter limit in query param" })
     @Type(() => Number)
     @Min(1)
