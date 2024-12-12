@@ -1,16 +1,16 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { UserRole } from '../../../models/role.model';
 import { RegisterUserDto } from '../../auth/dtos/user.register';
 import { IsEnum, IsOptional, IsString, Validate, ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from 'class-validator';
-import { AtOneLeastRequired } from '../../decorator/oneItemMustBeRequired';
+import { AtOneLeastRequired } from '../../../decorator/oneItemMustBeRequired';
 import { User } from '../../../models/user.model';
-import { IFile } from '@nestjs/common/pipes/file/interfaces';
+import { UserDto } from './user.dto';
 
 
 
 
 export class UpdateUserDto extends PartialType(RegisterUserDto) {
-    @ApiPropertyOptional()
+    @ApiPropertyOptional({ type: "string", format: "binary" })
     @IsOptional()
     @IsString()
     profile?: Express.Multer.File;
@@ -31,7 +31,9 @@ export class UpdateUserDto extends PartialType(RegisterUserDto) {
 }
 
 
+
 export class UpdateUserRespone {
-    @ApiProperty({ type: () => User })
+    @ApiProperty({ type: PickType(UserDto, ["email", 'username', 'bio', 'id', 'phone', 'profile']) })
+
     user: User
 }

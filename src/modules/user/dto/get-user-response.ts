@@ -1,21 +1,31 @@
 import { Loaded } from "@mikro-orm/core";
 import { User } from "../../../models/user.model";
 import { ApiProperty } from "@nestjs/swagger";
+import { UserDto } from "./user.dto";
 
+
+class Meta {
+    @ApiProperty()
+    page: number;
+
+    @ApiProperty()
+    count: number;
+
+    @ApiProperty()
+    countAll: number;
+
+    @ApiProperty()
+    allPages: number
+}
 export class GetAllUserResponse {
-    @ApiProperty()
+    @ApiProperty({ type: UserDto })
     users: Loaded<User, never, "*", never>[]
-    @ApiProperty()
-    meta: {
-        page: number,
-        count: number,
-        countAll: number,
-        allPages: number
-    }
+    @ApiProperty({ type: () => Meta })
+    meta: Meta
 }
 
 
 export class GetOneUserResponse {
-    @ApiProperty()
+    @ApiProperty({ type: UserDto })
     user: User
 }

@@ -4,7 +4,7 @@ import { UpdateUserDto, UpdateUserRespone } from './dto/update-user.dto';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
 import { Pagination } from '../../types/paggination.type';
-import { ApiBearerAuth, ApiConflictResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConflictResponse, ApiConsumes, ApiExpectationFailedResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '../../uploader/file-size.uploader';
@@ -31,6 +31,7 @@ export class UserController {
   @ApiOkResponse({ description: "user updated successfully", type: UpdateUserRespone })
   @ApiNotFoundResponse({ description: "user not found" })
   @ApiConflictResponse({ description: "email is taken by another user" })
+  @ApiConsumes('multipart/form-data')
   @Patch(':id')
   @UseInterceptors(FileInterceptor("profile"))
   update(
