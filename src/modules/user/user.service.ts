@@ -6,6 +6,7 @@ import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { Pagination } from '../../types/paggination.type';
 import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response';
 import { PATH_TO_WRITE, writeToFile } from '../../uploader/writeToFile';
+import { RemoveUserResponse } from './dto/remove-user.dto';
 
 @Injectable()
 export class UserService {
@@ -84,7 +85,17 @@ export class UserService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number): Promise<RemoveUserResponse> {
+    const user = await this.userRepository.findOne({ id });
+    if (!user)
+      throw new NotFoundException(this.USER_NOT_FOUND)
+
+    try {
+      await this.em.removeAndFlush(user);
+      return { isRemoved: true, user };
+    } catch (err) {
+      this.logger.error(err)
+      throw new InternalServerErrorException()
+    }
   }
 }

@@ -9,6 +9,7 @@ import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '../../uploader/file-size.uploader';
 import { FileTypeValidationPipe } from '../../uploader/file-type.uploader';
+import { RemoveUserResponse } from './dto/remove-user.dto';
 
 @ApiBearerAuth()
 @Role(UserRole.ADMIN)
@@ -49,8 +50,10 @@ export class UserController {
     return this.userService.update(id, body);
   }
 
+  @ApiNotFoundResponse({ description: "user not found." })
+  @ApiOkResponse({ description: "user removed successfully.", type: RemoveUserResponse })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number): Promise<RemoveUserResponse> {
+    return this.userService.remove(id);
   }
 }
