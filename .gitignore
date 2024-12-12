@@ -3,6 +3,10 @@
 /node_modules
 /build
 
+public/profile/*
+
+public/profile/product
+
 # Logs
 logs
 *.log
