@@ -1,12 +1,16 @@
-import { Controller, Get, Body, Patch, Param, Delete, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, ParseIntPipe, Query, UseInterceptors, UploadedFile, FileTypeValidator, ParseFilePipe, MaxFileSizeValidator } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto, UpdateUserRespone } from './dto/update-user.dto';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
 import { Pagination } from '../../types/paggination.type';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConflictResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileSizeValidationPipe } from '../../uploader/file-size.uploader';
+import { FileTypeValidationPipe } from '../../uploader/file-type.uploader';
 
+@ApiBearerAuth()
 @Role(UserRole.ADMIN)
 @Controller('user')
 export class UserController {
@@ -24,9 +28,24 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
+  @ApiOkResponse({ description: "user updated successfully", type: UpdateUserRespone })
+  @ApiNotFoundResponse({ description: "user not found" })
+  @ApiConflictResponse({ description: "email is taken by another user" })
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  @UseInterceptors(FileInterceptor("profile"))
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateUserDto,
+    @UploadedFile(
+      new FileSizeValidationPipe(2),
+      new FileTypeValidationPipe(["image/png", "image/jpeg"]),
+      new ParseFilePipe({
+        fileIsRequired: false
+      })
+
+    ) file: Express.Multer.File): Promise<UpdateUserRespone> {
+    body.profile = file ?? null;
+    return this.userService.update(id, body);
   }
 
   @Delete(':id')

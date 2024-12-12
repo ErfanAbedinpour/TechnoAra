@@ -9,6 +9,8 @@ export class FileSizeValidationPipe implements PipeTransform {
         this.bytes = this.size * 1024 * 1024
     }
     transform(value: IFile, metadata: ArgumentMetadata) {
+        if (!value)
+            return null;
         const reuslt = value.size <= this.bytes;
         if (!reuslt)
             throw new BadRequestException(`excpected file size less than ${this.size} MB`)

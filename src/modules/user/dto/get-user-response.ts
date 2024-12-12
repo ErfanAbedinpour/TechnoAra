@@ -17,5 +17,5 @@ export class GetAllUserResponse {
 
 export class GetOneUserResponse {
     @ApiProperty()
-    user: Loaded<User, "*", "*", never>
+    user: User
 }

@@ -1,19 +1,24 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { UpdateUserDto, UpdateUserRespone } from './dto/update-user.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../models/user.model';
-import { EntityRepository } from '@mikro-orm/postgresql';
+import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
 import { Pagination } from '../../types/paggination.type';
 import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response';
+import { PATH_TO_WRITE, writeToFile } from '../../uploader/writeToFile';
 
 @Injectable()
 export class UserService {
 
   private USER_NOT_FOUND = "user does not found"
+  private INVALID_EMAIL = "email is exsist."
 
+  private logger = new Logger(UserService.name)
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,) { }
+    private readonly userRepository: EntityRepository<User>,
+    private readonly em: EntityManager) { }
+
 
   async findAll({ limit, page }: Pagination): Promise<GetAllUserResponse> {
 
@@ -43,8 +48,40 @@ export class UserService {
     return { user };
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UpdateUserRespone> {
+    const user = await this.userRepository.findOne({ id });
+
+    // check user is exsist or not
+    if (!user)
+      throw new NotFoundException(this.USER_NOT_FOUND)
+
+    for (const prop in updateUserDto) {
+      if (prop === 'profile' && updateUserDto[prop]) {
+        // write to dest path
+        const profile = updateUserDto['profile'];
+        const { filename } = await writeToFile(PATH_TO_WRITE.profile, profile);
+        user[prop] = filename;
+      }
+      // validate email
+      else if (prop === 'email' && updateUserDto[prop]) {
+        const isValidEmail = await this.userRepository.findOne({ email: updateUserDto.email });
+        if (isValidEmail) {
+          throw new ConflictException(this.INVALID_EMAIL)
+        }
+      }
+      else if (updateUserDto[prop] && user[prop] !== updateUserDto[prop]) {
+        user[prop] = updateUserDto[prop]
+      }
+    }
+
+    try {
+      await this.em.flush()
+      return { user };
+    } catch (err) {
+      await this.em.rollback();
+      this.logger.error(err)
+      throw new InternalServerErrorException(err.message)
+    }
   }
 
   remove(id: number) {
