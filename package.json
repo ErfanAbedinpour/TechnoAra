@@ -48,6 +48,7 @@
     "class-validator": "^0.14.1",
     "decimal.js": "^10.4.3",
     "ioredis": "^5.4.1",
+    "multer": "^1.4.5-lts.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "uuid": "^11.0.3"
@@ -62,6 +63,7 @@
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
+    "@types/multer": "^1.4.12",
     "@types/node": "^20.17.9",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
