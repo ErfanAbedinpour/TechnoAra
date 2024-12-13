@@ -1,5 +1,5 @@
 
-import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { User } from "../../models/user.model";
@@ -10,6 +10,7 @@ import { RefreshTokenDto } from "./dtos/refresh.token.dto";
 import { RefreshTokenService } from "./tokens/refreshToken.service";
 import { Role } from "./decorator/role.decorator";
 import { UserRole } from "../../models/role.model";
+import { JsonWebTokenError } from "@nestjs/jwt";
 
 
 
@@ -73,26 +74,29 @@ export class AuthService {
 
 
     async token({ refreshToken: token }: RefreshTokenDto) {
-        const { id } = await this.refreshTokenService.verify(token);
-
-        const isValidate = await this.userToken.validate(id, token);
-
-        if (!isValidate)
-            throw new UnauthorizedException(this.INVALID_REFRESH_TOKEN)
-
-        await this.userToken.invalidate(id, token);
-
-        const user = await this.em.findOne(User, { id: id });
-
-        if (!user)
-            throw new BadRequestException(this.USER_NOT_FOUND)
-
         try {
+            let { id } = await this.refreshTokenService.verify(token);
+            const isValidate = await this.userToken.validate(id, token);
+
+            if (!isValidate)
+                throw new UnauthorizedException(this.INVALID_REFRESH_TOKEN)
+
+            await this.userToken.invalidate(id, token);
+
+            const user = await this.em.findOne(User, { id: id });
+
+            if (!user)
+                throw new BadRequestException(this.USER_NOT_FOUND)
+
             const { accessToken, refreshToken } = await this.userToken.signTokens(user);
-
             return { accessToken, refreshToken }
-
         } catch (err) {
+            if (err instanceof JsonWebTokenError)
+                throw new UnauthorizedException(this.INVALID_REFRESH_TOKEN)
+
+            if (err instanceof HttpException)
+                throw err;
+
             this.logger.error(err.message)
             throw new InternalServerErrorException()
         }
