@@ -7,6 +7,7 @@ import { Pagination } from '../../types/paggination.type';
 import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response';
 import { PATH_TO_WRITE, writeToFile } from '../../uploader/writeToFile';
 import { RemoveUserResponse } from './dto/remove-user.dto';
+import { UserTokenService } from '../auth/tokens/user.token.service';
 
 @Injectable()
 export class UserService {
@@ -18,7 +19,8 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
-    private readonly em: EntityManager) { }
+    private readonly em: EntityManager,
+    private readonly userTokenService: UserTokenService) { }
 
 
   async findAll({ limit, page }: Pagination): Promise<GetAllUserResponse> {
@@ -93,6 +95,7 @@ export class UserService {
     try {
       await this.em.removeAndFlush(user);
       return { isRemoved: true, user };
+
     } catch (err) {
       this.logger.error(err)
       throw new InternalServerErrorException()

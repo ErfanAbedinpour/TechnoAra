@@ -13,9 +13,10 @@ export class RefreshTokenService {
     ) { }
 
 
-    async sign(payload: Partial<User>) {
+    async sign(payload: RefreshTokenPayload) {
         return this.jwtService.sign({
             id: payload.id,
+            tokenId: payload.tokenId
         }, {
             secret: this.configuratoin.secret,
             expiresIn: String((+this.configuratoin.expireTime * 24 * 60 * 60 * 1000 + Date.now()))
@@ -31,4 +32,5 @@ export class RefreshTokenService {
 
 export class RefreshTokenPayload {
     id: number;
+    tokenId: string
 }

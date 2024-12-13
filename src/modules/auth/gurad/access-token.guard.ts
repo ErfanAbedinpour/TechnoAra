@@ -1,13 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { AccessTokenService, CurentUser } from "../tokens/accessToken.service";
 import { Request } from "express";
+import { UserTokenService } from "../tokens/user.token.service";
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
     private readonly INVALID_TOKEN = "token is expired or invaid."
     private readonly HEADER_NOT_VALID = "header is Empty or Its not Bearer"
 
-    constructor(private readonly accessTokenService: AccessTokenService) { }
+    constructor(private readonly accessTokenService: AccessTokenService, private readonly userTokenService: UserTokenService) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
 
@@ -20,6 +21,7 @@ export class AccessTokenGuard implements CanActivate {
 
         try {
             const paylaod = await this.accessTokenService.verify(token);
+
             request.user = paylaod;
             return true
         } catch (err) {

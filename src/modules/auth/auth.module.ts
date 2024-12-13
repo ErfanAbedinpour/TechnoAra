@@ -23,6 +23,7 @@ import { RoleGurad } from "./gurad/role.guard";
         JwtModule.register({}),
         ConfigModule.forRoot({ load: [accessTokenConfig, refreshTokenConfig] }),
     ],
+    exports: [UserTokenService],
     providers: [AuthService,
         {
             provide: HashService,

@@ -21,7 +21,7 @@ export class AuthService {
     private readonly INVALID_EMAIL = "email is registered by another user."
     private readonly INVALID_CRENDENTIAL = "email or password incorrect"
     private readonly INVALID_REFRESH_TOKEN = "token is invaid"
-    private readonly USER_NOT_FOUND = "user does not found";
+    private readonly USER_NOT_FOUND = "account not found.";
     private logger = new Logger(AuthService.name);
     constructor(
         private readonly em: EntityManager,
@@ -75,13 +75,13 @@ export class AuthService {
 
     async token({ refreshToken: token }: RefreshTokenDto) {
         try {
-            let { id } = await this.refreshTokenService.verify(token);
-            const isValidate = await this.userToken.validate(id, token);
+            let { id, tokenId } = await this.refreshTokenService.verify(token);
+            const isValidate = await this.userToken.validate(id, tokenId, token);
 
             if (!isValidate)
                 throw new UnauthorizedException(this.INVALID_REFRESH_TOKEN)
 
-            await this.userToken.invalidate(id, token);
+            await this.userToken.invalidate(id, tokenId);
 
             const user = await this.em.findOne(User, { id: id });
 
