@@ -36,7 +36,7 @@ import { RemoveUserResponse } from './dto/remove-user.dto';
 @Role(UserRole.ADMIN)
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @ApiOkResponse({
     description: 'fetch users succesfully',
