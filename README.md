@@ -106,7 +106,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 - [x] AccessToken and refreshToken 
 - [x] AuthGurad
 - [x] RoleGurad
-- []  User Create,Read,Update,Delete => CRUD 
+- [x]  User Create,Read,Update,Delete => CRUD 
 - [] Product 
 
 
