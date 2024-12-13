@@ -21,7 +21,7 @@ export class AccessTokenService {
             username: payload.username
         }, {
             secret: this.configuratoin.secret,
-            expiresIn: (+this.configuratoin.expireTime * 60 * 1000 + Date.now())
+            expiresIn: String((+this.configuratoin.expireTime * 60 * 1000 + Date.now()))
         })
     }
 

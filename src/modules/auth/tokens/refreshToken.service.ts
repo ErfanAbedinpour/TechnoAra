@@ -18,7 +18,7 @@ export class RefreshTokenService {
             id: payload.id,
         }, {
             secret: this.configuratoin.secret,
-            expiresIn: (+this.configuratoin.expireTime * 24 * 60 * 60 * 1000 + Date.now())
+            expiresIn: String((+this.configuratoin.expireTime * 24 * 60 * 60 * 1000 + Date.now()))
         })
     }
 
