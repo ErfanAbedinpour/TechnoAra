@@ -11,6 +11,8 @@ import { RefreshTokenService } from "./tokens/refreshToken.service";
 import { Role } from "./decorator/role.decorator";
 import { UserRole } from "../../models/role.model";
 import { JsonWebTokenError } from "@nestjs/jwt";
+import { BlackListService } from "./blacklist/blacklist.service";
+import { LogoutResponse } from "./dtos/user-logout-response";
 
 
 
@@ -27,7 +29,8 @@ export class AuthService {
         private readonly em: EntityManager,
         private readonly hashService: HashService,
         private readonly userToken: UserTokenService,
-        private readonly refreshTokenService: RefreshTokenService
+        private readonly refreshTokenService: RefreshTokenService,
+        private readonly blackList: BlackListService
 
     ) { }
 
@@ -98,6 +101,20 @@ export class AuthService {
                 throw err;
 
             this.logger.error(err.message)
+            throw new InternalServerErrorException()
+        }
+    }
+
+
+    async logout(tokenId: string, userId: number, token: string): Promise<LogoutResponse> {
+        try {
+            await this.userToken.invalidate(userId, tokenId);
+            await this.blackList.setToBlackList(token)
+            return {
+                message: "user logout successfully"
+            }
+        } catch (err) {
+            this.logger.error(err);
             throw new InternalServerErrorException()
         }
     }

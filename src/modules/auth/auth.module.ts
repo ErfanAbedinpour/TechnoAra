@@ -16,6 +16,7 @@ import { APP_GUARD } from "@nestjs/core";
 import { AuthGuard } from "./gurad/auth.guard";
 import { AccessTokenGuard } from "./gurad/access-token.guard";
 import { RoleGurad } from "./gurad/role.guard";
+import { BlackListService } from "./blacklist/blacklist.service";
 
 
 @Module({
@@ -23,16 +24,12 @@ import { RoleGurad } from "./gurad/role.guard";
         JwtModule.register({}),
         ConfigModule.forRoot({ load: [accessTokenConfig, refreshTokenConfig] }),
     ],
-    exports: [UserTokenService],
-    providers: [AuthService,
+    exports: [UserTokenService, BlackListService],
+    providers: [
         {
             provide: HashService,
             useClass: ArgonService
         },
-        AccessTokenService,
-        RefreshTokenService,
-        UserTokenService,
-        AccessTokenGuard,
         {
             provide: APP_GUARD,
             useClass: AuthGuard
@@ -40,7 +37,13 @@ import { RoleGurad } from "./gurad/role.guard";
         {
             provide: APP_GUARD,
             useClass: RoleGurad
-        }
+        },
+        AuthService,
+        AccessTokenService,
+        RefreshTokenService,
+        UserTokenService,
+        AccessTokenGuard,
+        BlackListService
     ],
     controllers: [AuthController],
 })

@@ -16,7 +16,10 @@ export class RedisRepository implements IRedis, OnApplicationBootstrap, OnApplic
     }
 
     async set(key: string, value: string, ttl?: number): Promise<string> {
-        return this.redis.set(key, value)
+        const res = this.redis.set(key, value)
+        if (ttl)
+            this.redis.expire(key, ttl)
+        return res;
     }
 
     async get(key: string): Promise<string> {

@@ -1,14 +1,17 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, ForbiddenException, HttpException, Injectable, InternalServerErrorException, Logger, UnauthorizedException } from "@nestjs/common";
 import { AccessTokenService, CurentUser } from "../tokens/accessToken.service";
 import { Request } from "express";
-import { UserTokenService } from "../tokens/user.token.service";
+import { BlackListService } from "../blacklist/blacklist.service";
+import { JsonWebTokenError } from "@nestjs/jwt";
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
     private readonly INVALID_TOKEN = "token is expired or invaid."
     private readonly HEADER_NOT_VALID = "header is Empty or Its not Bearer"
+    private readonly TOKEN_BLOCKED = "token is blocked"
 
-    constructor(private readonly accessTokenService: AccessTokenService, private readonly userTokenService: UserTokenService) { }
+    private logger = new Logger(AccessTokenGuard.name);
+    constructor(private readonly accessTokenService: AccessTokenService, private readonly blackListService: BlackListService) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
 
@@ -20,12 +23,24 @@ export class AccessTokenGuard implements CanActivate {
             throw new UnauthorizedException(this.HEADER_NOT_VALID)
 
         try {
+            const isBlocked = await this.blackListService.isInBlackList(token);
+            if (isBlocked)
+                throw new ForbiddenException(this.TOKEN_BLOCKED);
+
             const paylaod = await this.accessTokenService.verify(token);
 
             request.user = paylaod;
+            request.token = token;
             return true
+
         } catch (err) {
-            throw new UnauthorizedException(this.INVALID_TOKEN)
+            if (err instanceof JsonWebTokenError)
+                throw new UnauthorizedException(this.INVALID_TOKEN)
+            if (err instanceof HttpException)
+                throw err;
+
+            this.logger.error(err)
+            throw new InternalServerErrorException();
         }
     }
 }
@@ -37,6 +52,7 @@ declare global {
     namespace Express {
         interface Request {
             user?: CurentUser;
+            token?: string
         }
     }
 }
