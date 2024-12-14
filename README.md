@@ -26,49 +26,6 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
-
-```bash
-$ npm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
 ## Resources
@@ -99,6 +56,119 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 
+# Features 
+- Modular artitechure
+- JWT Base Authentication
+- Role Based Access Contorol(RBAC) Authorization
+- Rate limiter
+- TypeScript
+- Request Validation
+- Error Handling
+- Unit Testing
+- Database Migrations
+- API Documentation (swagger)
+
+## 🛠 Tech Stack
+
+- Node.js
+- TypeScript
+- Nestjs
+- Postgresql with Mikro-orm
+- Jest for Testing
+- class validator for Validation
+- JWT for Authentication
+- Swagger for Documentation 
+
+## Project Structure
+
+```
+project-root/
+├── src/
+│   ├── config                # basic app config 
+│   │── decorator             # global decorators
+│   │── import                # project imports 
+│   │       ├── external.ts   # Import external modules
+│   │       └── internal.ts   # Import internal modules
+│   │── migrations            # Database migrations
+│   │── models                # Database Models
+│   ├── modules               # App Modules 
+│   ├── seeders               # Database Seeders
+├── types                     # Application (interfaces,types,...)   
+└── uploader                  # config for uploader(multer) 
+```
+
+## 🔧 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- MySQL
+- npm
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/ErfanAbedinpour/TechnoAra.git
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. Run database migrations:
+```bash
+npm run migration:run
+```
+
+5. Start the development server:
+```bash
+npm run dev
+```
+### using dokcer for run
+
+1. Clone the repository:
+```bash
+git clone https://github.com/ErfanAbedinpour/TechnoAra.git
+```
+
+2. Run Database migrations:
+```bash
+docker compose up migration
+```
+
+3. Run Database Seeders:
+```bash
+docker compose up seed 
+```
+
+4. Start
+```bash
+docker compose up 
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run E2E tests 
+npm run test:e2e
+```
+
+### Api Documentaion
+
+- Swagger Docuement http://host:port/docs
+
+
 ## TODO
 
 - [x] Login
@@ -108,6 +178,4 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 - [x] RoleGurad
 - [x] User Create,Read,Update,Delete => CRUD 
 - [] Product 
-
-
 
