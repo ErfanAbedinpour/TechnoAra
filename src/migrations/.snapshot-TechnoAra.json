@@ -1101,6 +1101,16 @@
           "length": 50,
           "mappedType": "string"
         },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
         "inventory": {
           "name": "inventory",
           "type": "int",
@@ -1152,6 +1162,16 @@
       "name": "products",
       "schema": "public",
       "indexes": [
+        {
+          "columnNames": [
+            "slug"
+          ],
+          "composite": false,
+          "keyName": "products_slug_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "keyName": "products_pkey",
           "columnNames": [

@@ -16,6 +16,10 @@ import { Comment } from "./comment.model";
 export class Product extends BaseEntity {
     @Property({ length: 50 })
     title!: string
+
+    @Property({ unique: true })
+    slug!: string
+
     @Property()
     inventory!: number
 
