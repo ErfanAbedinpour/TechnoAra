@@ -19,13 +19,10 @@ import { UserRole } from '../../models/role.model';
 import { JsonWebTokenError } from '@nestjs/jwt';
 import { BlackListService } from './blacklist/blacklist.service';
 import { LogoutResponse } from './dtos/user-logout-response';
+import { ErrorMessages } from '../../errorResponse/err.response';
 
 @Injectable()
 export class AuthService {
-  private readonly INVALID_EMAIL = 'email is registered by another user.';
-  private readonly INVALID_CRENDENTIAL = 'email or password incorrect';
-  private readonly INVALID_REFRESH_TOKEN = 'token is invaid';
-  private readonly USER_NOT_FOUND = 'account not found.';
   private logger = new Logger(AuthService.name);
   constructor(
     private readonly em: EntityManager,
@@ -33,7 +30,7 @@ export class AuthService {
     private readonly userToken: UserTokenService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly blackList: BlackListService,
-  ) {}
+  ) { }
 
   async register({
     email,
@@ -48,7 +45,7 @@ export class AuthService {
       { fields: ['id', 'email'] },
     );
 
-    if (isValidEmail) throw new BadRequestException(this.INVALID_EMAIL);
+    if (isValidEmail) throw new BadRequestException(ErrorMessages.INVALID_EMAIL);
 
     try {
       const defaultUserRole = await this.em.findOne(Role, {
@@ -80,7 +77,7 @@ export class AuthService {
     );
 
     if (!user || !(await this.hashService.compare(password, user.password)))
-      throw new BadRequestException(this.INVALID_CRENDENTIAL);
+      throw new BadRequestException(ErrorMessages.INVALID_CRENDENTIAL);
 
     // generate new token for Authorization
 
@@ -100,20 +97,20 @@ export class AuthService {
       const isValidate = await this.userToken.validate(id, tokenId, token);
 
       if (!isValidate)
-        throw new UnauthorizedException(this.INVALID_REFRESH_TOKEN);
+        throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);
 
       await this.userToken.invalidate(id, tokenId);
 
       const user = await this.em.findOne(User, { id: id });
 
-      if (!user) throw new BadRequestException(this.USER_NOT_FOUND);
+      if (!user) throw new BadRequestException(ErrorMessages.USER_NOT_FOUND);
 
       const { accessToken, refreshToken } =
         await this.userToken.signTokens(user);
       return { accessToken, refreshToken };
     } catch (err) {
       if (err instanceof JsonWebTokenError)
-        throw new UnauthorizedException(this.INVALID_REFRESH_TOKEN);
+        throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);
 
       if (err instanceof HttpException) throw err;
 
