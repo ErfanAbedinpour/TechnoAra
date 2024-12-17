@@ -34,7 +34,7 @@ export class UserService {
         page,
         count: users.length,
         countAll,
-        allPages: Math.floor(countAll / 10)
+        allPages: Math.floor(countAll / limit)
       }
     }
   }

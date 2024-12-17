@@ -64,8 +64,30 @@ export class ProductService {
     }
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll(limit: number, page: number) {
+    const offset = (page - 1) * limit;
+
+    try {
+      const [products, count] = await this.em.findAndCount(Product, {}, {
+        limit: limit,
+        offset,
+        fields: ["category.title", "user.username", "title", "slug", "price", "inventory"],
+        populate: ['category'],
+        orderBy: { id: "asc" }
+      })
+      return {
+        products,
+        meta: {
+          countRow: count,
+          count: products.length,
+          allpages: Math.ceil(count / limit) || 1,
+          page,
+        }
+      };
+    } catch (err) {
+      this.logger.error(err)
+      throw new InternalServerErrorException()
+    }
   }
 
   findOne(id: number) {
