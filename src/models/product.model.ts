@@ -29,7 +29,7 @@ export class Product extends BaseEntity {
     @ManyToOne(() => User, { fieldName: "user_id", nullable: false, deleteRule: "set null" })
     user!: Rel<User>
 
-    @Property({ columnType: 'numeric(10,2)', type: () => Decimal, nullable: false })
+    @Property({ type: 'decimal', columnType: 'numeric(10,2)', nullable: false })
     price!: Decimal
 
     @ManyToOne(() => Category, { fieldName: "category_id", nullable: false, deleteRule: "set null" })

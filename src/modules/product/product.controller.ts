@@ -2,14 +2,18 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { GetUser } from '../auth/decorator/get-user.decorator';
+import { Role } from '../auth/decorator/role.decorator';
+import { UserRole } from '../../models/role.model';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  @Role(UserRole.ADMIN)
+  create(@GetUser('id') userId: number, @Body() createProductDto: CreateProductDto) {
+    return this.productService.create(createProductDto, userId);
   }
 
   @Get()
@@ -23,11 +27,13 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @Role(UserRole.ADMIN)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(+id, updateProductDto);
   }
 
   @Delete(':id')
+  @Role(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
