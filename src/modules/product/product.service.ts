@@ -7,6 +7,7 @@ import { Category } from '../../models/category.model';
 import { User } from '../../models/user.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { EntityManager } from '@mikro-orm/postgresql';
+import slugify from 'slugify';
 
 @Injectable()
 export class ProductService {
@@ -15,7 +16,12 @@ export class ProductService {
     private readonly em: EntityManager) { }
 
   async create(createProductDto: CreateProductDto, userId: number): Promise<CreateProductRespone> {
-    const { category, description, price, quantity, slug, title } = createProductDto;
+    let { category, description, price, quantity, slug, title } = createProductDto;
+    slug = slugify(slug, {
+      replacement: "-",
+      lower: true,
+      trim: true
+    })
 
     const [categoryInstance, userInstance] = await Promise.all([
       this.em.findOne(Category, { id: category }, { exclude: ["createdAt", "updatedAt", "user"] }),
