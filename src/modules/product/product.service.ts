@@ -8,6 +8,7 @@ import { User } from '../../models/user.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { EntityManager } from '@mikro-orm/postgresql';
 import slugify from 'slugify';
+import { GetAllProductResponse } from './dto/get-product';
 
 @Injectable()
 export class ProductService {
@@ -64,7 +65,7 @@ export class ProductService {
     }
   }
 
-  async findAll(limit: number, page: number) {
+  async findAll(limit: number, page: number): Promise<GetAllProductResponse> {
     const offset = (page - 1) * limit;
 
     try {
@@ -78,9 +79,9 @@ export class ProductService {
       return {
         products,
         meta: {
-          countRow: count,
+          countAll: count,
           count: products.length,
-          allpages: Math.ceil(count / limit) || 1,
+          allPages: Math.ceil(count / limit) || 1,
           page,
         }
       };

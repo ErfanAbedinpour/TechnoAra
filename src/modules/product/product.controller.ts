@@ -7,6 +7,7 @@ import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { Pagination } from '../../types/paggination.type';
+import { GetAllProductResponse } from './dto/get-product';
 
 @Controller('product')
 export class ProductController {
@@ -22,9 +23,9 @@ export class ProductController {
     return this.productService.create(createProductDto, userId);
   }
 
-  @ApiOkResponse({ description: "products find successfully" })
+  @ApiOkResponse({ description: "products find successfully", type: GetAllProductResponse })
   @Get()
-  findAll(@Query() { limit, page }: Pagination) {
+  findAll(@Query() { limit, page }: Pagination): Promise<GetAllProductResponse> {
     return this.productService.findAll(limit, page);
   }
 
