@@ -1,18 +1,23 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
   @Post()
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ description: "product created successfully", type: CreateProductRespone })
+  @ApiBadRequestResponse({ description: "slug is already taken." })
+  @ApiNotFoundResponse({ description: "category or user information invalid." })
   @Role(UserRole.ADMIN)
-  create(@GetUser('id') userId: number, @Body() createProductDto: CreateProductDto) {
+  create(@GetUser('id') userId: number, @Body() createProductDto: CreateProductDto): Promise<CreateProductRespone> {
     return this.productService.create(createProductDto, userId);
   }
 

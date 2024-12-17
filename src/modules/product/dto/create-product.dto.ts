@@ -33,3 +33,27 @@ export class CreateProductDto {
     @ApiProperty()
     category: number
 }
+
+
+export class CreateProductRespone {
+    @ApiProperty()
+    "id": number
+
+    @ApiProperty()
+    "title": string
+
+    @ApiProperty()
+    "slug": string
+
+    @ApiProperty()
+    "inventory": number
+
+    @ApiProperty()
+    "user": number
+
+    @ApiProperty()
+    "price": Decimal
+
+    @ApiProperty()
+    "category": number
+}
