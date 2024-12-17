@@ -22,6 +22,7 @@ export default defineConfig({
     baseDir: process.cwd(),
     driver: PostgreSqlDriver,
     logger: (msg) => logger.debug(msg),
+    metadataCache: { enabled: true },
     seeder: {
         path: "./src/seeders",
         pathTs: "./src/seeders",
@@ -40,5 +41,4 @@ export default defineConfig({
         dropTables: true,
         emit: 'ts',
     },
-
 });
