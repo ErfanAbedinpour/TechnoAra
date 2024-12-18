@@ -6,9 +6,12 @@ import Decimal from 'decimal.js';
 import { Category } from '../../models/category.model';
 import { User } from '../../models/user.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
-import { EntityManager } from '@mikro-orm/postgresql';
+import { EntityManager, NotFoundError } from '@mikro-orm/postgresql';
 import slugify from 'slugify';
 import { GetAllProductResponse } from './dto/get-product';
+import { Brand } from '../../models/brand.model';
+import { Order } from '../../models/order.model';
+import { OrderItem } from '../../models/order-item.model';
 
 @Injectable()
 export class ProductService {
@@ -17,14 +20,16 @@ export class ProductService {
     private readonly em: EntityManager) { }
 
   async create(createProductDto: CreateProductDto, userId: number): Promise<CreateProductRespone> {
-    let { category, description, price, quantity, slug, title } = createProductDto;
+    let { category, description, brand, price, quantity, slug, title } = createProductDto;
     slug = slugify(slug, {
       replacement: "-",
       lower: true,
       trim: true
     })
 
-    const [categoryInstance, userInstance] = await Promise.all([
+
+    const [brandInstance, categoryInstance, userInstance] = await Promise.all([
+      this.em.findOne(Brand, { id: brand }),
       this.em.findOne(Category, { id: category }, { exclude: ["createdAt", "updatedAt", "user"] }),
       this.em.findOne(User, { id: userId })
     ])
@@ -49,10 +54,11 @@ export class ProductService {
           describtion: description,
           title,
           user: userInstance,
+          brand: brandInstance,
           createdAt: Date.now(),
           updatedAt: Date.now()
         }
-      ).returning(["id", "title", "price", "user", "inventory", "category", "slug"]).execute("get");
+      ).returning(["id", "title", "price", "user", "inventory", "category", "slug", "brand"]).execute("get");
 
       return result;
     } catch (err) {
@@ -67,15 +73,15 @@ export class ProductService {
 
   async findAll(limit: number, page: number): Promise<GetAllProductResponse> {
     const offset = (page - 1) * limit;
-
     try {
-      const [products, count] = await this.em.findAndCount(Product, {}, {
+      const [products, count] = await this.em.findAndCount(Product, { inventory: { $gte: 1 } }, {
         limit: limit,
         offset,
-        fields: ["category.title", "user.username", "title", "slug", "price", "inventory"],
-        populate: ['category'],
+        fields: ["category.title", "user.username", "title", "slug", "price", "inventory", "brand.name"],
+        populate: ['category', 'brand'],
         orderBy: { id: "asc" }
       })
+
       return {
         products,
         meta: {
@@ -91,8 +97,21 @@ export class ProductService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number) {
+    try {
+      const product = await this.em.findOneOrFail(Product, { id }, {
+        exclude: ["attributes.products", "brand.user"],
+        populate: ['comments', "attributes", "brand", 'category', 'orders'],
+        orderBy: { id: "asc" }
+      });
+
+      return { product }
+    } catch (err) {
+      if (err instanceof NotFoundError)
+        throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
+      this.logger.error(err)
+      throw new InternalServerErrorException();
+    }
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
