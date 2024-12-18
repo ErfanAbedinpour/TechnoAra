@@ -32,6 +32,11 @@ export class CreateProductDto {
     @IsNumber()
     @ApiProperty()
     category: number
+    @IsNotEmpty({ message: "brand_id is required" })
+    @ApiProperty()
+    @IsNumber()
+    @Min(1)
+    brand: number
 }
 
 
