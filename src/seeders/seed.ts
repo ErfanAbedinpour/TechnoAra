@@ -12,8 +12,8 @@ export class DatabaseSeeder extends Seeder {
         const user = em.create(Role, { name: UserRole.USER });
 
         await em.persistAndFlush([admin, user]);
-        const adminUser = new UserFactory(em).makeOne({ username: "admin", email: "admin@gmail.com", 'password': "Test11223344_", role: admin })
-        new UserFactory(em).make(10, { role: user })
+        const adminUser = new UserFactory(em).makeOne({ username: "admin", email: "admin@gmail.com", password: "Test11223344_", role: admin, cart: {} })
+        new UserFactory(em).make(10, { role: user, cart: {} })
         await em.flush();
 
         em.create(Category, {

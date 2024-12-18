@@ -7,7 +7,7 @@ import { BaseEntity } from "./base.entity";
 
 @Entity({ tableName: "carts" })
 export class Cart extends BaseEntity {
-    @OneToOne(() => User, { fieldName: "User_id", owner: true })
+    @OneToOne(() => User, { fieldName: "User_id", owner: true, deleteRule: "cascade" })
     user: Rel<User>
 
     @ManyToMany(() => Product, product => product.carts, { pivotEntity: () => CartProduct })

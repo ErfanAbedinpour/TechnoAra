@@ -10,6 +10,7 @@ import { Attribute } from "./attribute.model";
 import { ProductAttribute } from "./product-attribute.model";
 import { BaseEntity } from "./base.entity";
 import { Comment } from "./comment.model";
+import { Brand } from "./brand.model";
 
 
 @Entity({ tableName: "products" })
@@ -47,4 +48,6 @@ export class Product extends BaseEntity {
     @OneToMany(() => Comment, comment => comment.product)
     comments = new Collection<Comment>(this)
 
+    @ManyToOne(() => Brand, { fieldName: "brand_id", nullable: false, deleteRule: "set null" })
+    brand: Rel<Brand>
 }

@@ -9,6 +9,8 @@ import { Notification } from "./notification.model";
 import { Comment } from "./comment.model";
 import { ArgonService } from "../modules/auth/hashingServices/argon.service";
 import { Wallet } from "./wallet.model";
+import { Cart } from "./cart.model";
+import { Brand } from "./brand.model";
 
 
 
@@ -56,6 +58,12 @@ export class User extends BaseEntity {
 
     @OneToMany(() => Comment, comment => comment.user)
     comments = new Collection<Comment>(this)
+
+    @OneToOne(() => Cart, cart => cart.user)
+    cart: Rel<Cart>
+
+    @OneToMany(() => Brand, brand => brand.user)
+    brands = new Collection<Brand>(this)
 
     @BeforeCreate()
     async beforeCreate(args: EventArgs<this>) {
