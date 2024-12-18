@@ -13,4 +13,3 @@ export class UserFactory extends Factory<User> {
         };
     }
 }
-
