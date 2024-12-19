@@ -6,18 +6,31 @@ import Decimal from 'decimal.js';
 import { Category } from '../../models/category.model';
 import { User } from '../../models/user.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
-import { EntityManager, NotFoundError } from '@mikro-orm/postgresql';
+import { EntityManager, ForeignKeyConstraintViolationException, NotFoundError } from '@mikro-orm/postgresql';
 import slugify from 'slugify';
 import { GetAllProductResponse } from './dto/get-product';
 import { Brand } from '../../models/brand.model';
-import { Order } from '../../models/order.model';
-import { OrderItem } from '../../models/order-item.model';
+import { Attribute } from '../../models/attribute.model';
+import { ProductAttribute } from '../../models/product-attribute.model';
 
 @Injectable()
 export class ProductService {
   private logger = new Logger(ProductService.name);
   constructor(
     private readonly em: EntityManager) { }
+
+  private async getProductById(id: number) {
+    const product = await this.em.findOne(Product, { id }, { refresh: true })
+
+    if (!product)
+      throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
+
+    return product;
+  }
+
+  private async isValidSlug(slug: string): Promise<boolean> {
+    return !this.em.findOne(Product, { slug })
+  }
 
   async create(createProductDto: CreateProductDto, userId: number): Promise<CreateProductRespone> {
     let { category, description, brand, price, quantity, slug, title } = createProductDto;
@@ -99,6 +112,7 @@ export class ProductService {
 
   async findOne(id: number) {
     try {
+      // find product and join brand and category and orders and comments
       const product = await this.em.findOneOrFail(Product, { id }, {
         exclude: ["attributes.products", "brand.user"],
         populate: ['comments', "attributes", "brand", 'category', 'orders'],
@@ -114,8 +128,47 @@ export class ProductService {
     }
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    const product = await this.getProductById(id);
+    //validate product
+
+    try {
+      if (updateProductDto.attributes) {
+        for (const { name, value } of updateProductDto.attributes) {
+          const attribute = await this.em.upsert(Attribute, { name, createdAt: Date.now(), updatedAt: Date.now() });
+          const productAttribute = this.em.create(ProductAttribute, { attribute, product, value });
+          // TODO: Upsert Product Attribute for Update value of Attribute On ProductAtribute
+          this.em.persist(productAttribute);
+        }
+      }
+
+      for (const prop in updateProductDto) {
+        if (prop !== 'attributes' && updateProductDto[prop]) {
+          product[prop] = updateProductDto[prop];
+        }
+      }
+
+      // const res = await this.em.upsert(Product, product);
+      await this.em.flush();
+      return true
+    } catch (err) {
+      if (err instanceof ForeignKeyConstraintViolationException) {
+        //@ts-ignore
+        switch (err.constraint) {
+          case "products_brand_id_foreign": {
+            throw new BadRequestException(ErrorMessages.BRAND_NOT_FOUND)
+          }
+          case "products_category_id_foreign": {
+            throw new BadRequestException(ErrorMessages.CATEGORY_NOT_FOUNT)
+          }
+        }
+        throw new InternalServerErrorException(err.stack)
+      }
+      // this.logger.error(err)
+      console.error(err)
+      throw new InternalServerErrorException();
+    }
+
   }
 
   remove(id: number) {
