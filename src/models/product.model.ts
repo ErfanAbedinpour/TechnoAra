@@ -6,7 +6,6 @@ import { Cart } from "./cart.model";
 import { CartProduct } from "./cart-product.model";
 import { Order } from "./order.model";
 import { OrderItem } from "./order-item.model";
-import { Attribute } from "./attribute.model";
 import { ProductAttribute } from "./product-attribute.model";
 import { BaseEntity } from "./base.entity";
 import { Comment } from "./comment.model";
@@ -25,7 +24,7 @@ export class Product extends BaseEntity {
     inventory!: number
 
     @Property({ type: "text" })
-    describtion!: string
+    description!: string
 
     @ManyToOne(() => User, { fieldName: "user_id", nullable: false, deleteRule: "set null" })
     user!: Rel<User>

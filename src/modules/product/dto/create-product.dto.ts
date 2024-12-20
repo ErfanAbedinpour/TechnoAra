@@ -1,9 +1,10 @@
+import { PlainObject } from "@mikro-orm/core";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsDecimal, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Min, MinLength } from "class-validator";
 import Decimal from "decimal.js";
 
 
-export class CreateProductDto {
+export class CreateProductDto extends PlainObject {
     @MinLength(5)
     @ApiProperty({
         required: true,

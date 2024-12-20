@@ -3,13 +3,9 @@ import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '../../models/product.model';
 import Decimal from 'decimal.js';
-import { Category } from '../../models/category.model';
-import { User } from '../../models/user.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
-import { EntityManager, ForeignKeyConstraintViolationException, NotFoundError } from '@mikro-orm/postgresql';
-import slugify from 'slugify';
+import { DriverException, EntityManager, ForeignKeyConstraintViolationException, NotFoundError, UniqueConstraintViolationException } from '@mikro-orm/postgresql';
 import { GetAllProductResponse } from './dto/get-product';
-import { Brand } from '../../models/brand.model';
 import { Attribute } from '../../models/attribute.model';
 import { ProductAttribute } from '../../models/product-attribute.model';
 
@@ -20,7 +16,10 @@ export class ProductService {
     private readonly em: EntityManager) { }
 
   private async getProductById(id: number) {
-    const product = await this.em.findOne(Product, { id }, { refresh: true })
+
+    const product = await this.em.findOne(Product, { id }, {
+      refresh: true
+    })
 
     if (!product)
       throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
@@ -28,56 +27,61 @@ export class ProductService {
     return product;
   }
 
-  private async isValidSlug(slug: string): Promise<boolean> {
-    return !this.em.findOne(Product, { slug })
+
+  private mikroOrmErrorHandler(err: Error) {
+    if (err instanceof DriverException) {
+      if (err.code === "21000") {
+        throw new BadRequestException(ErrorMessages.ATTRIBUTES_NOT_VALID);
+      }
+    }
+
+    if (err instanceof UniqueConstraintViolationException) {
+      //@ts-ignore
+      switch (err.constraint) {
+        case "products_slug_unique": {
+          throw new BadRequestException(ErrorMessages.INVALID_SLUG)
+        }
+      }
+    }
+
+    if (err instanceof ForeignKeyConstraintViolationException) {
+      //@ts-ignore
+      switch (err.constraint) {
+        case "products_brand_id_foreign": {
+          throw new BadRequestException(ErrorMessages.BRAND_NOT_FOUND)
+        }
+        case "products_category_id_foreign": {
+          throw new BadRequestException(ErrorMessages.CATEGORY_NOT_FOUNT)
+        }
+      }
+    }
   }
 
+
   async create(createProductDto: CreateProductDto, userId: number): Promise<CreateProductRespone> {
-    let { category, description, brand, price, quantity, slug, title } = createProductDto;
-    slug = slugify(slug, {
-      replacement: "-",
-      lower: true,
-      trim: true
-    })
+    let { category, description, brand, price, inventory, slug, title } = createProductDto;
 
-
-    const [brandInstance, categoryInstance, userInstance] = await Promise.all([
-      this.em.findOne(Brand, { id: brand }),
-      this.em.findOne(Category, { id: category }, { exclude: ["createdAt", "updatedAt", "user"] }),
-      this.em.findOne(User, { id: userId })
-    ])
-
-    if (!categoryInstance)
-      throw new NotFoundException(ErrorMessages.CATEGORY_NOT_FOUNT)
-
-    if (!userInstance)
-      throw new NotFoundException(ErrorMessages.USER_NOT_FOUND)
 
     const decimalPrice = new Decimal(price);
 
     try {
-      const qb = this.em.createQueryBuilder(Product);
+      const product = this.em.create(Product, {
+        category: category,
+        price: decimalPrice,
+        slug: slug,
+        inventory: inventory,
+        description: description,
+        title,
+        user: userId,
+        brand: brand,
+      }, { persist: true, partial: true });
 
-      const result = await qb.insert(
-        {
-          category: categoryInstance,
-          price: decimalPrice,
-          slug: slug,
-          inventory: quantity,
-          describtion: description,
-          title,
-          user: userInstance,
-          brand: brandInstance,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
-        }
-      ).returning(["id", "title", "price", "user", "inventory", "category", "slug", "brand"]).execute("get");
+      await this.em.flush();
 
-      return result;
+      return (product as unknown) as CreateProductRespone;
     } catch (err) {
-      if (err.code && err.code === "23505")
-        throw new BadRequestException(ErrorMessages.INVALID_SLUG)
-
+      console.error(err)
+      this.mikroOrmErrorHandler(err);
       this.logger.error(err)
       throw new InternalServerErrorException()
 
@@ -114,7 +118,7 @@ export class ProductService {
     try {
       // find product and join brand and category and orders and comments
       const product = await this.em.findOneOrFail(Product, { id }, {
-        exclude: ["attributes.products", "brand.user"],
+        exclude: ["attributes.product", "brand.user"],
         populate: ['comments', "attributes", "brand", 'category', 'orders'],
         orderBy: { id: "asc" }
       });
@@ -131,41 +135,46 @@ export class ProductService {
   async update(id: number, updateProductDto: UpdateProductDto) {
     const product = await this.getProductById(id);
     //validate product
-
     try {
+      const attributes: Attribute[] = [];
+      const productAttributes: ProductAttribute[] = [];
+
       if (updateProductDto.attributes) {
+
         for (const { name, value } of updateProductDto.attributes) {
-          const attribute = await this.em.upsert(Attribute, { name, createdAt: Date.now(), updatedAt: Date.now() });
-          const productAttribute = this.em.create(ProductAttribute, { attribute, product, value });
-          // TODO: Upsert Product Attribute for Update value of Attribute On ProductAtribute
-          this.em.persist(productAttribute);
+          // create instance of attribute
+          const attribute = this.em.create(Attribute, { name, createdAt: Date.now(), updatedAt: Date.now() });
+
+          // push attribute into list for upsert at once
+          attributes.push(attribute);
+          productAttributes.push({ attribute, value, product: product });
         }
       }
 
-      for (const prop in updateProductDto) {
-        if (prop !== 'attributes' && updateProductDto[prop]) {
-          product[prop] = updateProductDto[prop];
+      for (const [prop, value] of Object.entries(updateProductDto)) {
+        if (prop !== "attributes" && value && product[prop] !== value) {
+          this.em.assign(product, { [prop]: value });
         }
       }
 
-      // const res = await this.em.upsert(Product, product);
-      await this.em.flush();
-      return true
+      // upsert attributes 
+      await this.em.upsertMany(
+        Attribute,
+        attributes,
+        { onConflictFields: ['name'], onConflictAction: "ignore" })
+
+      await Promise.all([
+        this.em.upsertMany(
+          ProductAttribute,
+          productAttributes,
+          { onConflictFields: ["attribute", "product"], onConflictAction: "merge", onConflictMergeFields: ["value"] }),
+        this.em.flush()
+      ])
+
+      return product
     } catch (err) {
-      if (err instanceof ForeignKeyConstraintViolationException) {
-        //@ts-ignore
-        switch (err.constraint) {
-          case "products_brand_id_foreign": {
-            throw new BadRequestException(ErrorMessages.BRAND_NOT_FOUND)
-          }
-          case "products_category_id_foreign": {
-            throw new BadRequestException(ErrorMessages.CATEGORY_NOT_FOUNT)
-          }
-        }
-        throw new InternalServerErrorException(err.stack)
-      }
-      // this.logger.error(err)
-      console.error(err)
+      this.mikroOrmErrorHandler(err);
+      this.logger.error(err)
       throw new InternalServerErrorException();
     }
 

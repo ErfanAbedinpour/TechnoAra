@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -8,6 +8,7 @@ import { UserRole } from '../../models/role.model';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { Pagination } from '../../types/paggination.type';
 import { GetAllProductResponse } from './dto/get-product';
+import { SlugifyInterceptor } from '../../interceptor/slugify.interceptor';
 
 @Controller('product')
 export class ProductController {
@@ -19,7 +20,8 @@ export class ProductController {
   @ApiCreatedResponse({ description: "product created successfully", type: CreateProductRespone })
   @ApiBadRequestResponse({ description: "slug is already taken." })
   @ApiNotFoundResponse({ description: "category or user information invalid." })
-  create(@GetUser('id') userId: number, @Body() createProductDto: CreateProductDto): Promise<CreateProductRespone> {
+  @UseInterceptors(SlugifyInterceptor)
+  create(@GetUser('id') userId: number, @Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto, userId);
   }
 
@@ -38,6 +40,7 @@ export class ProductController {
 
   @Patch(':id')
   @Role(UserRole.ADMIN)
+  @UseInterceptors(SlugifyInterceptor)
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(+id, updateProductDto);
   }

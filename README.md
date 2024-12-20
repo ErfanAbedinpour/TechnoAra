@@ -177,5 +177,20 @@ npm run test:e2e
 - [x] AuthGurad
 - [x] RoleGurad
 - [x] User Create,Read,Update,Delete => CRUD 
+- [] E2E test and unit test
 - [] Product 
-
+- [] category CRUD 
+- [] Brand CRUD
+- [] Search product  
+- [] Delete account
+- [] reset password
+- [] article 
+- [] comment for product 
+- [] comment for article
+- [] add blog or article to favirite
+- [] dashborad
+- [] User panel
+- [] orders
+- [] payment
+- [] Welcome Message 
+- [] Welcome Message 

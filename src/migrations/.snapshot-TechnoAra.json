@@ -1281,8 +1281,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "describtion": {
-          "name": "describtion",
+        "description": {
+          "name": "description",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
