@@ -42,8 +42,8 @@ export class Product extends BaseEntity {
     @ManyToMany(() => Order, order => order.products, { pivotEntity: () => OrderItem })
     orders = new Collection<Order>(this)
 
-    @ManyToMany(() => Attribute, attr => attr.products, { pivotEntity: () => ProductAttribute })
-    attributes = new Collection<Attribute>(this)
+    @OneToMany(() => ProductAttribute, attr => attr.product)
+    attributes = new Collection<ProductAttribute>(this)
 
     @OneToMany(() => Comment, comment => comment.product)
     comments = new Collection<Comment>(this)

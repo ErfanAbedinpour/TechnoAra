@@ -4,7 +4,7 @@ import { Attribute } from "./attribute.model";
 
 
 
-@Entity({ tableName: "Product-Attribute" })
+@Entity({ tableName: "productAttributes" })
 export class ProductAttribute {
     @ManyToOne(() => Product, { primary: true, fieldName: "product_id" })
     product!: Rel<Product>

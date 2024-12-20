@@ -1,5 +1,4 @@
-import { Collection, Entity, ManyToMany, Property } from "@mikro-orm/core";
-import { Product } from "./product.model";
+import { Collection, Entity, ManyToMany, OneToMany, Property } from "@mikro-orm/core";
 import { ProductAttribute } from "./product-attribute.model";
 import { BaseEntity } from "./base.entity";
 
@@ -10,6 +9,6 @@ export class Attribute extends BaseEntity {
     @Property({ unique: true })
     name!: string
 
-    @ManyToMany(() => Product, product => product.attributes, { pivotEntity: () => ProductAttribute, owner: true })
-    products = new Collection<Product>(this)
+    @OneToMany(() => ProductAttribute, product => product.attribute,)
+    products = new Collection<ProductAttribute>(this)
 }

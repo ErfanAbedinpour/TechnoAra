@@ -1399,8 +1399,8 @@
     },
     {
       "columns": {
-        "attribute_id": {
-          "name": "attribute_id",
+        "product_id": {
+          "name": "product_id",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -1408,8 +1408,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "product_id": {
-          "name": "product_id",
+        "attribute_id": {
+          "name": "attribute_id",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
@@ -1428,14 +1428,14 @@
           "mappedType": "string"
         }
       },
-      "name": "Product-Attribute",
+      "name": "productAttributes",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "Product-Attribute_pkey",
+          "keyName": "productAttributes_pkey",
           "columnNames": [
-            "attribute_id",
-            "product_id"
+            "product_id",
+            "attribute_id"
           ],
           "composite": true,
           "constraint": true,
@@ -1445,28 +1445,28 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "Product-Attribute_attribute_id_foreign": {
-          "constraintName": "Product-Attribute_attribute_id_foreign",
-          "columnNames": [
-            "attribute_id"
-          ],
-          "localTableName": "public.Product-Attribute",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.attribute",
-          "updateRule": "cascade"
-        },
-        "Product-Attribute_product_id_foreign": {
-          "constraintName": "Product-Attribute_product_id_foreign",
+        "productAttributes_product_id_foreign": {
+          "constraintName": "productAttributes_product_id_foreign",
           "columnNames": [
             "product_id"
           ],
-          "localTableName": "public.Product-Attribute",
+          "localTableName": "public.productAttributes",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.products",
+          "updateRule": "cascade"
+        },
+        "productAttributes_attribute_id_foreign": {
+          "constraintName": "productAttributes_attribute_id_foreign",
+          "columnNames": [
+            "attribute_id"
+          ],
+          "localTableName": "public.productAttributes",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "public.attribute",
           "updateRule": "cascade"
         }
       },
