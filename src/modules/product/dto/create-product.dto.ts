@@ -30,12 +30,12 @@ export class CreateProductDto {
     @IsNumber()
     @ApiProperty({
         required: true,
-        name: "quantity",
+        name: "inventory",
         example: 5,
         description: "qauntity of product",
         minimum: 1
     })
-    quantity: number
+    inventory: number
     @IsNotEmpty()
     @IsString()
     @MinLength(10)
