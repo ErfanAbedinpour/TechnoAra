@@ -1455,6 +1455,7 @@
             "id"
           ],
           "referencedTableName": "public.products",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "productAttributes_attribute_id_foreign": {
@@ -1467,6 +1468,7 @@
             "id"
           ],
           "referencedTableName": "public.attribute",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

@@ -6,10 +6,10 @@ import { Attribute } from "./attribute.model";
 
 @Entity({ tableName: "productAttributes" })
 export class ProductAttribute {
-    @ManyToOne(() => Product, { primary: true, fieldName: "product_id" })
+    @ManyToOne(() => Product, { primary: true, fieldName: "product_id", deleteRule: 'cascade' })
     product!: Rel<Product>
 
-    @ManyToOne(() => Attribute, { primary: true, fieldName: "attribute_id" })
+    @ManyToOne(() => Attribute, { primary: true, fieldName: "attribute_id", deleteRule: 'cascade' })
     attribute!: Rel<Attribute>
 
     @Property()
