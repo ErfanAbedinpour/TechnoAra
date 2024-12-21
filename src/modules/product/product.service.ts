@@ -180,7 +180,18 @@ export class ProductService {
 
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    try {
+      // find product 
+      const product = await this.em.findOneOrFail(Product, id);
+      // remove them
+      await this.em.removeAndFlush(product)
+      return product;
+    } catch (err) {
+      if (err instanceof NotFoundError)
+        throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
+      this.logger.error(err)
+      throw new InternalServerErrorException()
+    }
   }
 }
