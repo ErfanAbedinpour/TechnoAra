@@ -177,8 +177,9 @@ npm run test:e2e
 - [x] AuthGurad
 - [x] RoleGurad
 - [x] User Create,Read,Update,Delete => CRUD 
+- [x] Product 
+- []  Attribute Module for Added to special Product and Remove them
 - [] E2E test and unit test
-- [] Product 
 - [] category CRUD 
 - [] Brand CRUD
 - [] Search product  
@@ -194,3 +195,86 @@ npm run test:e2e
 - [] payment
 - [] Welcome Message 
 - [] Welcome Message 
+
+## EndPoints
+
+### Authentication 
+#### Singup 
+```HTTP
+POST http://localhost:3000/auth/singup
+"Content-Type":"application/json"
+```
+#### Login
+```HTTP
+POST http://localhost:3000/auth/login
+"Content-Type":"application/json"
+```
+#### GetAccessToken
+```HTTP
+POST http://localhost:3000/auth/token
+"Content-Type":"application/json"
+```
+#### Logout
+```HTTP
+POST http://localhost:3000/auth/logout
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+### User(Admin Permission)
+#### FindAll
+```HTTP
+GET http://localhost:3000/user?limit=?&page=?
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+#### FindOne
+```HTTP
+GET http://localhost:3000/user/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+#### Update
+```HTTP
+PATCH http://localhost:3000/user/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+#### Delete
+```HTTP
+DELETE http://localhost:3000/user/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+### Product
+#### Create
+```HTTP
+POST http://localhost:3000/product
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+#### FindAll
+```HTTP
+GET http://localhost:3000/product?limit=?&page=?
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+#### FindOne
+```HTTP
+GET http://localhost:3000/product/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+#### Upate Or Added Attribute
+```HTTP
+PATCH http://localhost:3000/product/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+#### Delete
+```HTTP
+DELETE http://localhost:3000/product/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+
