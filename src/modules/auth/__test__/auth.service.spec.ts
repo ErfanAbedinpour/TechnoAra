@@ -9,8 +9,13 @@ import { UserTokenService } from "../tokens/user.token.service";
 import { RefreshTokenService } from "../tokens/refreshToken.service";
 import { BlackListService } from "../blacklist/blacklist.service";
 import { mock } from "jest-mock-extended";
+import { BadRequestException, UnauthorizedException } from "@nestjs/common";
+import { Role, UserRole } from "../../../models/role.model";
+import { ErrorMessages } from "../../../errorResponse/err.response";
 
-describe("auth service", function() {
+describe("auth service", function () {
+
+	let role: Role;
 	let authService: AuthService;
 	let em: EntityManager;
 	let userTokenMock = mock<UserTokenService>();
@@ -21,8 +26,9 @@ describe("auth service", function() {
 		const moduelRef = await Test.createTestingModule({
 			imports: [
 				MikroOrmModule.forRoot({
-					entities: [User],
-					dbName: ":memory",
+					entities: ['./dist/models/*.model.js'],
+					entitiesTs: ['./src/models/*.model.ts'],
+					dbName: ":memory:",
 					ensureDatabase: { create: true },
 					allowGlobalContext: true,
 					driver: SqliteDriver,
@@ -52,12 +58,123 @@ describe("auth service", function() {
 
 		authService = moduelRef.get(AuthService);
 		em = moduelRef.get(EntityManager);
+		role = em.create(Role, {
+			name: UserRole.USER
+		})
+
+		const user = new User();
+		user.username = "fake-username"
+		user.email = "fake@gmail.com"
+		user.password = '12341234'
+		user.role = role;
+
+		await em.persistAndFlush(role);
+		await em.persistAndFlush(user);
 	});
 
-	it("happy ", () => {
+	it("ensure Defiend", () => {
 		expect(authService).toBeDefined();
 		expect(em).toBeDefined();
 	});
 
-	describe("register Service", () => { });
+	describe("register Service", () => {
+
+		it("should be pass for create user ok", async () => {
+
+			const resPromise = authService.register({ email: "myEmail@gmail.com", password: "12341234", username: "newOne" })
+			expect(resPromise).resolves.toBeTruthy()
+			expect(resPromise).resolves.toStrictEqual({ success: true })
+		})
+
+		it("invalid email", async () => {
+			const resPromise = authService.register({ email: "fake@gmail.com", username: "newOne", password: "12341234" })
+			expect(resPromise).rejects.toThrow(BadRequestException)
+			expect(resPromise).rejects.toThrow(ErrorMessages.INVALID_EMAIL);
+		})
+	});
+
+	describe("Login User", () => {
+		it("should be return accessToken and refreshToken", async () => {
+			jest.spyOn(userTokenMock, 'signTokens').mockResolvedValue({ accessToken: "", refreshToken: "" });
+			const resPromise = authService.login({ email: "fake@gmail.com", password: "12341234" });
+			expect(resPromise).resolves.toStrictEqual({ accessToken: "", refreshToken: "" });
+		})
+
+
+		it("should be throw Error if credential not valid", () => {
+			const resPromise = authService.login({ email: "new@gmail.com", password: "12341234" })
+
+			expect(resPromise).rejects.toThrow(BadRequestException)
+			expect(resPromise).rejects.toThrow(ErrorMessages.INVALID_CRENDENTIAL)
+		})
+	})
+
+	describe("get token", () => {
+		it("return error if refreshToken invalid", async () => {
+			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValueOnce(
+				{
+					tokenId: "",
+					id: 0
+				}
+			)
+			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(false)
+
+			const resPromise = authService.token({ refreshToken: "" });
+			expect(resPromise).rejects.toThrow(UnauthorizedException)
+			expect(resPromise).rejects.toThrow(ErrorMessages.INVALID_REFRESH_TOKEN);
+		})
+
+		it("should be throw badRequest if user not found", () => {
+			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValue(
+				{
+					tokenId: "",
+					id: 0
+				}
+			)
+			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(true)
+			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true)
+			const resPromise = authService.token({ refreshToken: "" });
+
+			expect(resPromise).rejects.toThrow(BadRequestException)
+			expect(resPromise).rejects.toThrow(ErrorMessages.USER_NOT_FOUND);
+		})
+
+		it("should be pass and reutrn new tokens", () => {
+			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValueOnce(
+				{
+					tokenId: "",
+					id: 1
+				})
+
+			jest.spyOn(userTokenMock, 'signTokens').mockResolvedValueOnce({
+				accessToken: "some-token",
+				refreshToken: "some-token2"
+			})
+
+			jest.spyOn(userTokenMock, 'validate').mockResolvedValue(true)
+
+			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValue(true)
+
+			const resPromise = authService.token({ refreshToken: "this is my" });
+
+			expect(resPromise).resolves.toBeTruthy();
+			expect(resPromise).resolves.toStrictEqual({
+				accessToken: "some-token",
+				refreshToken: 'some-token2'
+			})
+		})
+	})
+
+
+	describe("logout User", () => {
+		it("shoud be logout", () => {
+			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true)
+			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce()
+
+			expect(authService.logout("", 2, "")).resolves.toStrictEqual({
+				message: "user logout successfully"
+			})
+
+		})
+	})
 });
