@@ -178,6 +178,7 @@ npm run test:e2e
 - [x] RoleGurad
 - [x] User Create,Read,Update,Delete => CRUD 
 - [x] Product 
+- []  make code Pretty By SOLID principle
 - []  Attribute Module for Added to special Product and Remove them
 - [] E2E test and unit test
 - [] category CRUD 
@@ -193,6 +194,7 @@ npm run test:e2e
 - [] User panel
 - [] orders
 - [] payment
+- [] Pricing Module for calculation price of product
 - [] Welcome Message 
 - [] Welcome Message 
 
