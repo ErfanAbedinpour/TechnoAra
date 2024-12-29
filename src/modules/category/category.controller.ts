@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryCreateResponse, CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { UpdateCategoryDto, UpdateCategoryResponse } from './dto/update-category.dto';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
 import { GetUser } from '../auth/decorator/get-user.decorator';
@@ -32,7 +32,7 @@ export class CategoryController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto): Promise<UpdateCategoryResponse> {
     return this.categoryService.update(+id, updateCategoryDto);
   }
 
