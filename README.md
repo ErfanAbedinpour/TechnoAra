@@ -181,7 +181,8 @@ npm run test:e2e
 - []  make code Pretty By SOLID principle
 - []  Attribute Module for Added to special Product and Remove them
 - [] E2E test and unit test
-- [] category CRUD 
+- [x] category CRUD 
+- [x] category Test
 - [] Brand CRUD
 - [] Search product  
 - [] Delete account
@@ -279,4 +280,10 @@ DELETE http://localhost:3000/product/:id
 "Authorization": "Bearer ..."
 ```
 
-
+## UI
+### main Page: 
+- https://undefineduser1381.github.io/Technoara/
+### user dashboard: 
+- https://undefineduser1381.github.io/Technoara/#/dashBoard/index
+### admin panel
+- https://undefineduser1381.github.io/Technoara/#/panel/dashboard
