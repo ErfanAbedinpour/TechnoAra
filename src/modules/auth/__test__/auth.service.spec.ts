@@ -12,6 +12,7 @@ import { mock } from "jest-mock-extended";
 import { BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { Role, UserRole } from "../../../models/role.model";
 import { ErrorMessages } from "../../../errorResponse/err.response";
+import { DB_TEST_CONFIG } from "../../../config/db.test.config";
 
 describe("auth service", function () {
 
@@ -25,14 +26,7 @@ describe("auth service", function () {
 	beforeAll(async () => {
 		const moduelRef = await Test.createTestingModule({
 			imports: [
-				MikroOrmModule.forRoot({
-					entities: ['./dist/models/*.model.js'],
-					entitiesTs: ['./src/models/*.model.ts'],
-					dbName: ":memory:",
-					ensureDatabase: { create: true },
-					allowGlobalContext: true,
-					driver: SqliteDriver,
-				}),
+				MikroOrmModule.forRoot(DB_TEST_CONFIG),
 			],
 			providers: [
 				AuthService,

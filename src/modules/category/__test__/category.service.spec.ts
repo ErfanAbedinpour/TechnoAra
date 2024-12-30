@@ -8,6 +8,7 @@ import { UserRole } from '../../../models/role.model';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ErrorMessages } from '../../../errorResponse/err.response';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { DB_TEST_CONFIG } from '../../../config/db.test.config';
 
 describe('CategoryService', () => {
   let service: CategoryService;
@@ -17,14 +18,7 @@ describe('CategoryService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        MikroOrmModule.forRoot({
-          entities: ['./dist/models/*.model.js'],
-          entitiesTs: ['./src/models/*.model.ts'],
-          dbName: ":memory:",
-          ensureDatabase: { create: true },
-          allowGlobalContext: true,
-          driver: SqliteDriver,
-        }),
+        MikroOrmModule.forRoot(DB_TEST_CONFIG),
       ],
       providers: [CategoryService],
     }).compile();
