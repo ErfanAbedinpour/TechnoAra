@@ -58,9 +58,7 @@ export class ProductService {
   }
 
 
-  async create(createProductDto: CreateProductDto, userId: number): Promise<CreateProductRespone> {
-    let { category, description, brand, price, inventory, slug, title } = createProductDto;
-
+  async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductRespone> {
 
     const decimalPrice = new Decimal(price);
 
@@ -80,7 +78,6 @@ export class ProductService {
 
       return (product as unknown) as CreateProductRespone;
     } catch (err) {
-      console.error(err)
       this.mikroOrmErrorHandler(err);
       this.logger.error(err)
       throw new InternalServerErrorException()
