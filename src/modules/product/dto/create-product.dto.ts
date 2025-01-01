@@ -1,5 +1,6 @@
 import { PlainObject } from "@mikro-orm/core";
 import { ApiProperty } from "@nestjs/swagger";
+import { Expose } from "class-transformer";
 import { IsBoolean, IsDecimal, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Min, MinLength } from "class-validator";
 import Decimal from "decimal.js";
 
@@ -63,24 +64,32 @@ export class CreateProductDto extends PlainObject {
 
 
 export class CreateProductRespone {
+    @Expose()
     @ApiProperty()
     "id": number
 
     @ApiProperty()
+    @Expose()
     "title": string
 
     @ApiProperty()
+    @Expose()
     "slug": string
 
     @ApiProperty()
+    @Expose()
     "inventory": number
 
     @ApiProperty()
+    @Expose()
     "user": number
 
+
     @ApiProperty()
+    @Expose()
     "price": Decimal
 
     @ApiProperty()
+    @Expose()
     "category": number
 }

@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { CategoryCreateResponse, CreateCategoryDto } from './dto/create-category.dto';
+import { CategoryResponse, CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto, UpdateCategoryResponse } from './dto/update-category.dto';
 import { EntityManager, NotFoundError, UniqueConstraintViolationException, wrap } from '@mikro-orm/postgresql';
 import { Category } from '../../models/category.model';
@@ -26,14 +26,14 @@ export class CategoryService {
 
   }
 
-  async create(userId: number, { slug, title, en_name, isActivate }: CreateCategoryDto): Promise<CategoryCreateResponse> {
+  async create(userId: number, { slug, title, en_name, isActivate }: CreateCategoryDto): Promise<CategoryResponse> {
     const category = this.em.create(Category, { slug, en_name, title, user: userId, isActivate: isActivate ?? true });
 
     try {
 
       await this.em.persistAndFlush(category);
 
-      return (category as unknown) as CategoryCreateResponse;
+      return (category as unknown) as CategoryResponse;
 
     } catch (err) {
       this.mikroOrmErrorHandler(err);

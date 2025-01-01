@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { ResponseDto } from "../../../abstract/response.abstract";
+import { Expose } from "class-transformer";
 
 export class CreateCategoryDto {
     @ApiProperty()
@@ -26,21 +28,29 @@ export class CreateCategoryDto {
     en_name: string
 }
 
-export class CategoryCreateResponse {
+export class CategoryResponse implements ResponseDto {
+    @Expose()
     @ApiProperty()
     "id": number;
+    @Expose()
     @ApiProperty()
     "createdAt": string
     @ApiProperty()
+    @Expose()
     "updatedAt": string;
     @ApiProperty()
+    @Expose()
     "slug": string;
+    @Expose()
     @ApiProperty()
     "title": string;
+    @Expose()
     @ApiProperty()
     "isActivate": boolean
     @ApiProperty()
+    @Expose()
     "user": number
     @ApiProperty()
+    @Expose()
     "en_name": string
 }

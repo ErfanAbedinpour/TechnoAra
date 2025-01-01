@@ -8,7 +8,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundRe
 import { GetUser } from "./decorator/get-user.decorator";
 import { Request } from "express";
 import { LogoutResponse } from "./dtos/user-logout-response";
-import { ResponeStructure } from "../../decorator/resposne-stucture.decorator";
+import { ResponseStructure } from "../../decorator/resposne-stucture.decorator";
 
 
 
@@ -21,7 +21,7 @@ export class AuthController {
     @Post("singup")
     @ApiCreatedResponse({ description: 'user created successfully.', type: RegisterUserResponse })
     @ApiBadRequestResponse({ description: 'email is invalid.' })
-    @ResponeStructure(RegisterUserResponse)
+    @ResponseStructure(RegisterUserResponse)
     register(@Body() body: RegisterUserDto): Promise<RegisterUserResponse> {
         return this.service.register(body);
     }
@@ -31,7 +31,7 @@ export class AuthController {
     @ApiOkResponse({ description: 'user logged in successfully.', type: UserLoginResponse })
     @ApiBadRequestResponse({ description: 'invalid crendential.' })
     @HttpCode(HttpStatus.OK)
-    @ResponeStructure(UserLoginResponse)
+    @ResponseStructure(UserLoginResponse)
     login(@Body() body: UserLoginDto): Promise<UserLoginResponse> {
         return this.service.login(body)
     }
@@ -41,7 +41,7 @@ export class AuthController {
     @ApiNotFoundResponse({ description: "user does not found." })
     @Post("/token")
     @HttpCode(HttpStatus.OK)
-    @ResponeStructure(RefreshTokenResponse)
+    @ResponseStructure(RefreshTokenResponse)
     token(@Body() body: RefreshTokenDto): Promise<RefreshTokenResponse> {
         return this.service.token(body)
     }
@@ -50,7 +50,7 @@ export class AuthController {
     @ApiBearerAuth()
     @Auth(AUTH_STRATEGIES.BEARER)
     @HttpCode(HttpStatus.OK)
-    @ResponeStructure(LogoutResponse)
+    @ResponseStructure(LogoutResponse)
     @Post('logout')
     logout(@GetUser('id') userId: number, @GetUser('tokenId') tokenId: string, @Req() req: Request): Promise<LogoutResponse> {
         return this.service.logout(tokenId, userId, req.token);
