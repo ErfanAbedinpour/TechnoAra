@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '../../models/product.model';
@@ -36,12 +36,7 @@ export class ProductService {
     }
 
     if (err instanceof UniqueConstraintViolationException) {
-      //@ts-ignore
-      switch (err.constraint) {
-        case "products_slug_unique": {
-          throw new BadRequestException(ErrorMessages.INVALID_SLUG)
-        }
-      }
+      throw new ConflictException(ErrorMessages.INVALID_SLUG)
     }
 
     if (err instanceof ForeignKeyConstraintViolationException) {
@@ -53,9 +48,14 @@ export class ProductService {
         case "products_category_id_foreign": {
           throw new BadRequestException(ErrorMessages.CATEGORY_NOT_FOUNT)
         }
+        default: {
+          throw new BadRequestException(ErrorMessages.UNKNOWN_ERROR)
+        }
       }
+
     }
   }
+
 
 
   async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductRespone> {
