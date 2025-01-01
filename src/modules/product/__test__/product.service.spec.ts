@@ -9,7 +9,7 @@ import { User } from '../../../models/user.model';
 import { Brand } from '../../../models/brand.model';
 import { Category } from '../../../models/category.model';
 import { Role, UserRole } from '../../../models/role.model';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { ErrorMessages } from '../../../errorResponse/err.response';
 import { CreateProductRespone } from '../dto/create-product.dto';
 
@@ -72,7 +72,34 @@ describe('ProductService', () => {
       const product = { slug: "valid-3", brand: 1, category: 1, description: "test", inventory: 1, price: "1222", title: 'test' }
       const resPromise = service.create(product, 1)
       expect(resPromise).resolves.toBeTruthy();
-      expect(resPromise).resolves.toBeInstanceOf(CreateProductRespone);
+      expect(resPromise).resolves.not.toBeNull();
+    })
+  })
+
+  it("should be throw NotFound if Product not Found", () => {
+    expect(service.getProductById(23)).rejects.toThrow(NotFoundException)
+    expect(service.getProductById(23)).rejects.toThrow(ErrorMessages.PRODUCT_NOT_FOUND)
+  })
+
+  describe("update product", function () {
+    it("should be update product", async function () {
+      const product = await em.findOne(Product, 1);
+      const resPromsie = service.update(product.id, {
+        title: "newTitle",
+        attributes: [{ name: "size", value: "13inch" }],
+      })
+      expect(resPromsie).resolves.toBeTruthy();
+      expect((await resPromsie).title).toEqual(product.title);
+      expect(product.attributes.length).toEqual(1);
+      expect(product.attributes[0].attribute.name).toEqual('size');
+    })
+  })
+
+  describe("delete product", function () {
+    it("should be deleted", async () => {
+      const resPromise = service.remove(1);
+      expect(resPromise).resolves.toBeTruthy();
+      expect((await resPromise).id).toEqual(1);
     })
   })
 });

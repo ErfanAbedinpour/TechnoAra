@@ -15,7 +15,7 @@ export class ProductService {
   constructor(
     private readonly em: EntityManager) { }
 
-  private async getProductById(id: number) {
+  async getProductById(id: number) {
 
     const product = await this.em.findOne(Product, { id }, {
       refresh: true
@@ -133,6 +133,19 @@ export class ProductService {
     const product = await this.getProductById(id);
     //validate product
     try {
+
+      /*
+        user send product attribute like this 
+        size 13ich
+        ram 6GB
+        ....
+        if this attribute exsist in Db append them to productAttribute Table 
+        and if not exsist create them.
+       */
+      /*
+        store attributes and productAttributes into array 
+        and insert whole them at once for decrease IO 
+       */
       const attributes: Attribute[] = [];
       const productAttributes: ProductAttribute[] = [];
 
@@ -142,7 +155,7 @@ export class ProductService {
           // create instance of attribute
           const attribute = this.em.create(Attribute, { name, createdAt: Date.now(), updatedAt: Date.now() });
 
-          // push attribute into list for upsert at once
+          // push attribute into list for whole at once
           attributes.push(attribute);
           productAttributes.push({ attribute, value, product: product });
         }
@@ -180,7 +193,7 @@ export class ProductService {
   async remove(id: number) {
     try {
       // find product 
-      const product = await this.em.findOneOrFail(Product, id);
+      const product = await this.getProductById(id);
       // remove them
       await this.em.removeAndFlush(product)
       return product;
