@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength } from "class-validator";
+import { ResponseDto } from "../../../abstract/response.abstract";
+import { Expose } from "class-transformer";
 
 export class RegisterUserDto {
     @IsString()
@@ -20,7 +22,8 @@ export class RegisterUserDto {
 
 }
 
-export class RegisterUserResponse {
+export class RegisterUserResponse implements ResponseDto {
+    @Expose()
     @ApiProperty()
     success: boolean
 }

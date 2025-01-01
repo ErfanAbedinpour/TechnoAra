@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty } from "class-validator";
+import { ResponseDto } from "../../../abstract/response.abstract";
+import { Exclude, Expose } from "class-transformer";
 
 export class RefreshTokenDto {
     @ApiProperty()
@@ -7,9 +9,11 @@ export class RefreshTokenDto {
     refreshToken: string
 }
 
-export class RefreshTokenResponse {
+export class RefreshTokenResponse implements ResponseDto {
+    @Expose()
     @ApiProperty()
     accessToken: string;
     @ApiProperty()
+    @Expose()
     refreshToken: string;
 }

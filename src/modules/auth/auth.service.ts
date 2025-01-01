@@ -84,7 +84,7 @@ export class AuthService {
     try {
       const { accessToken, refreshToken } =
         await this.userToken.signTokens(user);
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, ok: true } as unknown as UserLoginResponse;
     } catch (err) {
       this.logger.error(err.message);
       throw new InternalServerErrorException();

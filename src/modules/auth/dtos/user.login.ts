@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, isNotEmpty, IsNotEmpty } from "class-validator";
+import { ResponseDto } from "../../../abstract/response.abstract";
+import { Expose } from "class-transformer";
 
 export class UserLoginDto {
     @IsNotEmpty()
@@ -12,9 +14,11 @@ export class UserLoginDto {
 }
 
 
-export class UserLoginResponse {
+export class UserLoginResponse implements ResponseDto {
+    @Expose()
     @ApiProperty()
     accessToken: string;
+    @Expose()
     @ApiProperty()
     refreshToken: string;
 }

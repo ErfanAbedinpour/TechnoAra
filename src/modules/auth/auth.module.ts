@@ -12,11 +12,12 @@ import accessTokenConfig from "./config/accessToken.config";
 import refreshTokenConfig from "./config/refreshToken.config";
 import { RefreshTokenService } from "./tokens/refreshToken.service";
 import { UserTokenService } from "./tokens/user.token.service";
-import { APP_GUARD } from "@nestjs/core";
+import { APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { AuthGuard } from "./gurad/auth.guard";
 import { AccessTokenGuard } from "./gurad/access-token.guard";
 import { RoleGurad } from "./gurad/role.guard";
 import { BlackListService } from "./blacklist/blacklist.service";
+import { ResponseSerializerInterceptor } from "../../interceptor/response-serializer.interceptor";
 
 
 @Module({
@@ -37,6 +38,10 @@ import { BlackListService } from "./blacklist/blacklist.service";
         {
             provide: APP_GUARD,
             useClass: RoleGurad
+        },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: ResponseSerializerInterceptor
         },
         AuthService,
         AccessTokenService,
