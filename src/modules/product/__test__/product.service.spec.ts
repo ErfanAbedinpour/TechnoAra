@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductService } from '../product.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { DB_TEST_CONFIG } from '../../../config/db.test.config';
-import { EntityManager, ForeignKeyConstraintViolationException } from '@mikro-orm/postgresql';
+import { EntityManager } from '@mikro-orm/postgresql';
 import { Product } from '../../../models/product.model';
 import Decimal from 'decimal.js';
 import { User } from '../../../models/user.model';
@@ -11,7 +11,7 @@ import { Category } from '../../../models/category.model';
 import { Role, UserRole } from '../../../models/role.model';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { ErrorMessages } from '../../../errorResponse/err.response';
-import { CreateProductRespone } from '../dto/create-product.dto';
+
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -100,6 +100,33 @@ describe('ProductService', () => {
       const resPromise = service.remove(1);
       expect(resPromise).resolves.toBeTruthy();
       expect((await resPromise).id).toEqual(1);
+    })
+  })
+
+
+  describe("remove Product Attribute", () => {
+    it("should be throw notFound attribute", async () => {
+      const res = await service.update(1, {
+        attributes: [{ name: "size", value: "13inch" }, { "name": "ram", value: "6GB" }],
+      })
+
+      const resPromise = service.removeAttribute(res.id, "inch");
+
+      expect(resPromise).rejects.toThrow(NotFoundException)
+      expect(resPromise).rejects.toThrow(ErrorMessages.ATTRIBUTES_NOT_VALID)
+    })
+    it("should be attribute remove successfully", async () => {
+      const res = await service.update(1, {
+        attributes: [{ name: "size", value: "13inch" }, { "name": "ram", value: "6GB" }],
+      })
+
+      expect(res.attributes.length).toBe(2)
+
+      const result = await service.removeAttribute(res.id, "ram");
+      expect(result).toStrictEqual({ success: true })
+
+      const product = await em.findOne(Product, 1)
+      expect(product.attributes.length).toBe(1)
     })
   })
 });

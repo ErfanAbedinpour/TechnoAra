@@ -39,7 +39,7 @@ export class ProductService {
     }
 
     if (err instanceof NotFoundError) {
-      throw new BadRequestException(ErrorMessages.PRODUCT_NOT_FOUND)
+      throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
     }
 
     if (err instanceof UniqueConstraintViolationException) {
