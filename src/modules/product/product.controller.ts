@@ -31,13 +31,17 @@ export class ProductController {
     return this.productService.findAll(limit, page);
   }
 
-  @Get(':id')
+  @Get(":id")
   @ApiOkResponse({ description: "product fetched successfully" })
   @ApiNotFoundResponse({ description: "product not found" })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.productService.findOne(id);
   }
 
+
+  @ApiOkResponse({ description: "product updated successfully", type: UpdateProductDto })
+  @ApiNotFoundResponse({ description: "Product not found" })
+  @ApiBearerAuth()
   @Patch(':id')
   @Role(UserRole.ADMIN)
   @UseInterceptors(SlugifyInterceptor)
@@ -45,6 +49,20 @@ export class ProductController {
     return this.productService.update(+id, updateProductDto);
   }
 
+
+  @ApiOkResponse({ description: "attribute remvoe successfully" })
+  @ApiNotFoundResponse({ description: "Product not found" })
+  @ApiBadRequestResponse({ description: "attribute not found" })
+  @ApiBearerAuth()
+  @Delete(":id/:attrName")
+  @Role(UserRole.ADMIN)
+  removeAttribute(@Param("id", ParseIntPipe) id: number, @Param("attrName") attrName: string) {
+    return this.productService.removeAttribute(id, attrName);
+  }
+
+  @ApiOkResponse({ description: "product remove successfully" })
+  @ApiNotFoundResponse({ description: "product not found" })
+  @ApiBearerAuth()
   @Delete(':id')
   @Role(UserRole.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {

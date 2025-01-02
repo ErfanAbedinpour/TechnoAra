@@ -8,6 +8,6 @@ export class ErrorMessages {
     static readonly USER_NOT_FOUND = 'account not found.';
     static readonly PRODUCT_NOT_FOUND = 'product not found.';
     static readonly BRAND_NOT_FOUND = 'brand not found.';
-    static readonly ATTRIBUTES_NOT_VALID = "attributes not valid"
+    static readonly ATTRIBUTES_NOT_VALID = "invalid attributes"
     static readonly UNKNOWN_ERROR = "Unknown Error Happend! please try again later"
 }

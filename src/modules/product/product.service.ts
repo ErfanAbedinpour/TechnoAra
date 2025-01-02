@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '../../models/product.model';
@@ -17,14 +17,17 @@ export class ProductService {
 
   async getProductById(id: number) {
 
-    const product = await this.em.findOne(Product, { id }, {
-      refresh: true
-    })
+    try {
+      const p = await this.em.findOneOrFail(Product, { id }, {
+        refresh: true
+      })
 
-    if (!product)
-      throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
-
-    return product;
+      return p;
+    } catch (err) {
+      this.mikroOrmErrorHandler(err)
+      this.logger.error(err)
+      throw new InternalServerErrorException();
+    }
   }
 
 
@@ -33,6 +36,10 @@ export class ProductService {
       if (err.code === "21000") {
         throw new BadRequestException(ErrorMessages.ATTRIBUTES_NOT_VALID);
       }
+    }
+
+    if (err instanceof NotFoundError) {
+      throw new BadRequestException(ErrorMessages.PRODUCT_NOT_FOUND)
     }
 
     if (err instanceof UniqueConstraintViolationException) {
@@ -202,6 +209,35 @@ export class ProductService {
         throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
       this.logger.error(err)
       throw new InternalServerErrorException()
+    }
+  }
+
+
+  // remove product Attribute
+  async removeAttribute(productId: number, attributeName: string): Promise<{ success: boolean }> {
+
+    // get product
+    const product = await this.getProductById(productId);
+
+    try {
+      // get attribute by name
+      const attribute = await this.em.findOne(ProductAttribute, { product, attribute: { name: attributeName } });
+
+
+      if (!attribute)
+        throw new NotFoundException(ErrorMessages.ATTRIBUTES_NOT_VALID)
+
+      // remove them
+      await this.em.removeAndFlush(attribute);
+
+      return { success: true }
+    } catch (err) {
+      if (err instanceof HttpException)
+        throw err;
+
+      this.mikroOrmErrorHandler(err)
+      this.logger.error(err)
+      throw new InternalServerErrorException();
     }
   }
 }
