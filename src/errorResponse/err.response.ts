@@ -10,4 +10,5 @@ export class ErrorMessages {
     static readonly BRAND_NOT_FOUND = 'brand not found.';
     static readonly ATTRIBUTES_NOT_VALID = "invalid attributes"
     static readonly UNKNOWN_ERROR = "Unknown Error Happend! please try again later"
+    static readonly INVALID_BRAND = "brand name is taken."
 }

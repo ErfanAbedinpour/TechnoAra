@@ -3,5 +3,6 @@ import { ReidsModule } from "../modules/redis/redis.module";
 import { UserModule } from "../modules/user/user.module";
 import { ProductModule } from "../modules/product/product.module";
 import { CategoryModule } from "../modules/category/category.module";
+import { BrandModule } from "../modules/brand/brand.module";
 
-export const internalImports = [AuthModule, ReidsModule, UserModule, ProductModule, CategoryModule];
+export const internalImports = [AuthModule, ReidsModule, UserModule, ProductModule, CategoryModule, BrandModule];
