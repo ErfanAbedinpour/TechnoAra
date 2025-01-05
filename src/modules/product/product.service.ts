@@ -8,6 +8,8 @@ import { DriverException, EntityManager, ForeignKeyConstraintViolationException,
 import { GetAllProductResponse } from './dto/get-product';
 import { Attribute } from '../../models/attribute.model';
 import { ProductAttribute } from '../../models/product-attribute.model';
+import { Brand } from '../../models/brand.model';
+import { BrandService } from '../brand/brand.service';
 
 @Injectable()
 export class ProductService {
@@ -69,6 +71,7 @@ export class ProductService {
 
     const decimalPrice = new Decimal(price);
 
+
     try {
       const product = this.em.create(Product, {
         category: category,
@@ -78,7 +81,7 @@ export class ProductService {
         description: description,
         title,
         user: userId,
-        brand: brand,
+        brand: brand
       }, { persist: true, partial: true });
 
       await this.em.flush();

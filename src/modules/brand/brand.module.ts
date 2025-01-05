@@ -3,7 +3,8 @@ import { BrandService } from './brand.service';
 import { BrandController } from './brand.controller';
 
 @Module({
+  exports: [BrandService],
   controllers: [BrandController],
   providers: [BrandService],
 })
-export class BrandModule {}
+export class BrandModule { }

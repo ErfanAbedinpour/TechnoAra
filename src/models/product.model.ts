@@ -47,6 +47,7 @@ export class Product extends BaseEntity {
     @OneToMany(() => Comment, comment => comment.product)
     comments = new Collection<Comment>(this)
 
-    @ManyToOne(() => Brand, { fieldName: "brand_id", nullable: false, deleteRule: "set null" })
+    @ManyToOne(() => Brand, { fieldName: "brand_id", nullable: true, deleteRule: "set null" })
+
     brand: Rel<Brand>
 }
