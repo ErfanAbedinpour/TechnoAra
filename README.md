@@ -178,26 +178,26 @@ npm run test:e2e
 - [x] RoleGurad
 - [x] User Create,Read,Update,Delete => CRUD 
 - [x] Product 
-- []  make code Pretty By SOLID principle
-- []  Attribute Module for Added to special Product and Remove them
-- [] E2E test and unit test
+- [ ]  make code Pretty By SOLID principle
+- [x]  Attribute Module for Added to special Product and Remove them
+- [ ] E2E test and unit test
 - [x] category CRUD 
 - [x] category Test
-- [] Brand CRUD
-- [] Search product  
-- [] Delete account
-- [] reset password
-- [] article 
-- [] comment for product 
-- [] comment for article
-- [] add blog or article to favirite
-- [] dashborad
-- [] User panel
-- [] orders
-- [] payment
-- [] Pricing Module for calculation price of product
-- [] Welcome Message 
-- [] Welcome Message 
+- [x] Brand CRUD
+- [ ] Search product  
+- [ ] Delete account
+- [ ] reset password
+- [ ] article 
+- [ ] comment for product 
+- [ ] comment for article
+- [ ] add blog or article to favirite
+- [ ] dashborad
+- [ ] User panel
+- [ ] orders
+- [ ] payment
+- [ ] Pricing Module for calculation price of product
+- [ ] Welcome Message 
+- [ ] Welcome Message 
 
 ## EndPoints
 
