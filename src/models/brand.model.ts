@@ -9,7 +9,7 @@ export class Brand extends BaseEntity {
     @ManyToOne(() => User, { fieldName: "user_id", nullable: false })
     user: Rel<User>
 
-    @Property({ nullable: false })
+    @Property({ nullable: false, unique: true })
     name: string;
 
     @OneToMany(() => Product, product => product.brand)
