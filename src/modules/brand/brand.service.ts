@@ -9,8 +9,7 @@ import { ErrorMessages } from '../../errorResponse/err.response';
 export class BrandService {
   private readonly logger = new Logger(BrandService.name);
 
-  constructor(private readonly em: EntityManager,
-  ) { }
+  constructor(private readonly em: EntityManager) { }
 
 
   private mikroOrmErrorHandler(err: Error) {
@@ -59,14 +58,8 @@ export class BrandService {
   async findOne(id: number) {
     // findBrand By Id
     const brand = await this.findById(id);
-    try {
-      // return brand
-      return brand
-    } catch (err) {
-      this.mikroOrmErrorHandler(err);
-      this.logger.error(err);
-      throw new InternalServerErrorException()
-    }
+    // return brand
+    return brand
   }
 
 
