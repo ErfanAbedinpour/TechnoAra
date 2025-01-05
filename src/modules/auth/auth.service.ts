@@ -82,9 +82,9 @@ export class AuthService {
     // generate new token for Authorization
 
     try {
-      const { accessToken, refreshToken } =
-        await this.userToken.signTokens(user);
-      return { accessToken, refreshToken, ok: true } as unknown as UserLoginResponse;
+      const { accessToken, refreshToken } = await this.userToken.signTokens(user);
+
+      return { accessToken, refreshToken } as UserLoginResponse;
     } catch (err) {
       this.logger.error(err.message);
       throw new InternalServerErrorException();

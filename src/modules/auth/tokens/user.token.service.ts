@@ -17,8 +17,10 @@ export class UserTokenService {
     async signTokens(user: Partial<User>): Promise<{ accessToken: string, refreshToken: string }> {
         const tokenId = v4();
         const [accessToken, refreshToken] = await Promise.all(
-            [this.accessToken.sign({ id: user.id, role: user.role.name, tokenId: tokenId, username: user.username }),
-            this.refreshToken.sign({ id: user.id, tokenId: tokenId })])
+            [
+                this.accessToken.sign({ id: user.id, role: user.role.name, tokenId: tokenId, username: user.username }),
+                this.refreshToken.sign({ id: user.id, tokenId: tokenId })
+            ])
 
         //store in redis
         await this.insert(tokenId, user.id, refreshToken);

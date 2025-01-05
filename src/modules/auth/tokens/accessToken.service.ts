@@ -11,9 +11,8 @@ export class AccessTokenService {
         private readonly jwtService: JwtService
     ) { }
 
-
     async sign(payload: CurentUser) {
-        console.log(this.configuratoin)
+
         return this.jwtService.sign({
             id: payload.id,
             role: payload.role,
@@ -21,7 +20,7 @@ export class AccessTokenService {
             tokenId: payload.tokenId
         }, {
             secret: this.configuratoin.secret,
-            expiresIn: String((+this.configuratoin.expireTime * 60 * 1000 + Date.now()))
+            expiresIn: String((+this.configuratoin.expireTime * 60 * 1000))
         })
     }
 
