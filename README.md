@@ -97,12 +97,23 @@ project-root/
 └── uploader                  # config for uploader(multer)
 ```
 
+## Packages
+- [Nestjs](https://nestjs.com/) (Main Framwork)
+- [MikroOrm](https://mikro-orm.io/)(mini Orm To Working With Postgres )
+- [postgresql](https://www.postgresql.org/)(Main Database)
+- [jwt](https://jwt.io/)(Autentication and Authorization By JsonWebToken)
+- [swagger](https://swagger.io/)(Documentation APIs)
+- [argon2](https://www.npmjs.com/package/argon2)(New Method for hashing Fast and safe)
+- [redis](https://redis.io/)(Redis for working with cache)
+- [decimaljs](https://www.npmjs.com/package/decimal.js/v/10.4.3) (decimal.js to have a high precision of numbers and to avoid [IEEE 754 floating point](https://en.wikipedia.org/wiki/Floating-point_arithmetic) pitfalls when working with monetary system)
+- [nodemailer](https://www.nodemailer.com/)(Sending Email)
+
 ## 🔧 Getting Started
 
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- MySQL
+- Postgres 
 - npm
 
 ### Installation
