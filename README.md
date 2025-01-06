@@ -55,8 +55,8 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
+# Features
 
-# Features 
 - Modular artitechure
 - JWT Base Authentication
 - Role Based Access Contorol(RBAC) Authorization
@@ -77,24 +77,24 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 - Jest for Testing
 - class validator for Validation
 - JWT for Authentication
-- Swagger for Documentation 
+- Swagger for Documentation
 
 ## Project Structure
 
 ```
 project-root/
 ├── src/
-│   ├── config                # basic app config 
+│   ├── config                # basic app config
 │   │── decorator             # global decorators
-│   │── import                # project imports 
+│   │── import                # project imports
 │   │       ├── external.ts   # Import external modules
 │   │       └── internal.ts   # Import internal modules
 │   │── migrations            # Database migrations
 │   │── models                # Database Models
-│   ├── modules               # App Modules 
+│   ├── modules               # App Modules
 │   ├── seeders               # Database Seeders
-├── types                     # Application (interfaces,types,...)   
-└── uploader                  # config for uploader(multer) 
+├── types                     # Application (interfaces,types,...)
+└── uploader                  # config for uploader(multer)
 ```
 
 ## 🔧 Getting Started
@@ -108,50 +108,60 @@ project-root/
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/ErfanAbedinpour/TechnoAra.git
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
 4. Run database migrations:
+
 ```bash
 npm run migration:run
 ```
 
 5. Start the development server:
+
 ```bash
 npm run dev
 ```
+
 ### using dokcer for run
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/ErfanAbedinpour/TechnoAra.git
 ```
 
 2. Run Database migrations:
+
 ```bash
 docker compose up migration
 ```
 
 3. Run Database Seeders:
+
 ```bash
-docker compose up seed 
+docker compose up seed
 ```
 
 4. Start
+
 ```bash
-docker compose up 
+docker compose up
 ```
 
 ### Running Tests
@@ -160,7 +170,7 @@ docker compose up
 # Run all tests
 npm test
 
-# Run E2E tests 
+# Run E2E tests
 npm run test:e2e
 ```
 
@@ -168,27 +178,26 @@ npm run test:e2e
 
 - Swagger Docuement http://host:port/docs
 
-
 ## TODO
 
 - [x] Login
 - [x] Register
-- [x] AccessToken and refreshToken 
+- [x] AccessToken and refreshToken
 - [x] AuthGurad
 - [x] RoleGurad
-- [x] User Create,Read,Update,Delete => CRUD 
-- [x] Product 
-- [ ]  make code Pretty By SOLID principle
-- [x]  Attribute Module for Added to special Product and Remove them
+- [x] User Create,Read,Update,Delete => CRUD
+- [x] Product
+- [ ] make code Pretty By SOLID principle
+- [x] Attribute Module for Added to special Product and Remove them
 - [ ] E2E test and unit test
-- [x] category CRUD 
+- [x] category CRUD
 - [x] category Test
 - [x] Brand CRUD
-- [ ] Search product  
+- [ ] Search product
 - [ ] Delete account
 - [ ] reset password
-- [ ] article 
-- [ ] comment for product 
+- [ ] article
+- [ ] comment for product
 - [ ] comment for article
 - [ ] add blog or article to favirite
 - [ ] dashborad
@@ -196,84 +205,112 @@ npm run test:e2e
 - [ ] orders
 - [ ] payment
 - [ ] Pricing Module for calculation price of product
-- [ ] Welcome Message 
-- [ ] Welcome Message 
+- [ ] Welcome Message
+- [ ] Welcome Message
 
 ## EndPoints
 
-### Authentication 
-#### Singup 
+### Authentication
+
+#### Singup
+
 ```HTTP
 POST http://localhost:3000/auth/singup
 "Content-Type":"application/json"
 ```
+
 #### Login
+
 ```HTTP
 POST http://localhost:3000/auth/login
 "Content-Type":"application/json"
 ```
+
 #### GetAccessToken
+
 ```HTTP
 POST http://localhost:3000/auth/token
 "Content-Type":"application/json"
 ```
+
 #### Logout
+
 ```HTTP
 POST http://localhost:3000/auth/logout
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 ### User(Admin Permission)
+
 #### FindAll
+
 ```HTTP
 GET http://localhost:3000/user?limit=?&page=?
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 #### FindOne
+
 ```HTTP
 GET http://localhost:3000/user/:id
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 #### Update
+
 ```HTTP
 PATCH http://localhost:3000/user/:id
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 #### Delete
+
 ```HTTP
 DELETE http://localhost:3000/user/:id
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 ### Product
+
 #### Create
+
 ```HTTP
 POST http://localhost:3000/product
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 #### FindAll
+
 ```HTTP
 GET http://localhost:3000/product?limit=?&page=?
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 #### FindOne
+
 ```HTTP
 GET http://localhost:3000/product/:id
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 #### Upate Or Added Attribute
+
 ```HTTP
 PATCH http://localhost:3000/product/:id
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```
+
 #### Delete
+
 ```HTTP
 DELETE http://localhost:3000/product/:id
 "Content-Type":"application/json"
@@ -281,9 +318,15 @@ DELETE http://localhost:3000/product/:id
 ```
 
 ## UI
-### main Page: 
+
+### main Page:
+
 - https://undefineduser1381.github.io/Technoara/
-### user dashboard: 
+
+### user dashboard:
+
 - https://undefineduser1381.github.io/Technoara/#/dashBoard/index
+
 ### admin panel
+
 - https://undefineduser1381.github.io/Technoara/#/panel/dashboard
