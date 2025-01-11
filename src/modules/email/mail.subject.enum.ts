@@ -1,5 +1,5 @@
 export enum MailSubject {
-    resetPassword = "reset-password",
-    deleteAccount = "delete account verification Code"
+    RESETPASSWORD= "reset-password",
+    DELETEACCOUNT= "delete account verification Code"
 }
 

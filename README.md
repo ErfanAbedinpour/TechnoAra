@@ -98,6 +98,7 @@ project-root/
 ```
 
 ## Packages
+
 - [Nestjs](https://nestjs.com/) (Main Framwork)
 - [MikroOrm](https://mikro-orm.io/)(mini Orm To Working With Postgres )
 - [postgresql](https://www.postgresql.org/)(Main Database)
@@ -113,7 +114,7 @@ project-root/
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- Postgres 
+- Postgres
 - npm
 
 ### Installation
@@ -198,9 +199,10 @@ npm run test:e2e
 - [x] RoleGurad
 - [x] User Create,Read,Update,Delete => CRUD
 - [x] Product
-- [ ] make code Pretty By SOLID principle
+- [x] make code Pretty By SOLID principle
 - [x] Attribute Module for Added to special Product and Remove them
 - [ ] E2E test and unit test
+- [ ] Cart Module
 - [x] category CRUD
 - [x] category Test
 - [x] Brand CRUD
@@ -216,8 +218,7 @@ npm run test:e2e
 - [ ] orders
 - [ ] payment
 - [ ] Pricing Module for calculation price of product
-- [ ] Welcome Message
-- [ ] Welcome Message
+- [ ] Welcome Message By Send Email Notification
 
 ## EndPoints
 

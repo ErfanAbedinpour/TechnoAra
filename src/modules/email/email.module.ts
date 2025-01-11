@@ -7,6 +7,6 @@ import nodemailerConfig from './config/email.config';
 @Module({
   imports: [ConfigModule.forFeature(nodemailerConfig)],
   providers: [EmailService],
-  exports: [EmailService]
+  exports: [EmailService],
 })
-export class EmailModule { }
+export class EmailModule {}
