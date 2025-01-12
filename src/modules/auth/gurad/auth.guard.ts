@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, HttpException, Injectable } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { AUTH_STRATEGIES, AUTH_TOKEN } from "../decorator/auth.decorator";
 import { AccessTokenGuard } from "./access-token.guard";

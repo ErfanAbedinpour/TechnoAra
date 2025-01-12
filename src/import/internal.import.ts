@@ -5,5 +5,6 @@ import { BrandModule } from "../modules/brand/brand.module";
 import { ReidsModule } from "../modules/redis/redis.module";
 import { UserModule } from "../modules/user/user.module";
 import { EmailModule } from "../modules/email/email.module";
+import { CartModule } from "../modules/cart/cart.module";
 
-export const internalImports = [AuthModule, ReidsModule, UserModule, ProductModule, CategoryModule, BrandModule, EmailModule];
+export const internalImports = [AuthModule, ReidsModule, UserModule, ProductModule, CategoryModule, BrandModule, EmailModule, CartModule];

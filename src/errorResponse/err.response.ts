@@ -11,4 +11,6 @@ export class ErrorMessages {
     static readonly ATTRIBUTES_NOT_VALID = "invalid attributes"
     static readonly UNKNOWN_ERROR = "Unknown Error Happend! please try again later"
     static readonly INVALID_BRAND = "brand name is taken."
+    static readonly PRODUCT_QUANTITY = "product is unavalible"
+    static readonly PRODUCT_EXSIST_IN_YOUR_CART = "Product exsists in your cart."
 }

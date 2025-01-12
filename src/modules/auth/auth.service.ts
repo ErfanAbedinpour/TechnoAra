@@ -20,6 +20,8 @@ import { JsonWebTokenError } from '@nestjs/jwt';
 import { BlackListService } from './blacklist/blacklist.service';
 import { LogoutResponse } from './dtos/user-logout-response';
 import { ErrorMessages } from '../../errorResponse/err.response';
+import { Cart } from '../../models/cart.model';
+import { Wallet } from '../../models/wallet.model';
 
 @Injectable()
 export class AuthService {
@@ -51,13 +53,16 @@ export class AuthService {
       const defaultUserRole = await this.em.findOne(Role, {
         name: UserRole.USER,
       });
-      const user = this.em.create(User, {
+
+
+      this.em.create(User, {
         username,
         email,
         password,
         role: defaultUserRole,
-      });
-      await this.em.persistAndFlush(user);
+      }, { persist: true });
+
+      await this.em.flush();
       return { success: true };
     } catch (err) {
       console.error(err);

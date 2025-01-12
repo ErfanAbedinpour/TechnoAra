@@ -9,23 +9,32 @@ import {
 } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
+import { Role } from '../auth/decorator/role.decorator';
+import { UserRole } from '../../models/role.model';
+import { GetUser } from '../auth/decorator/get-user.decorator';
 
-@Controller('cart/:userId')
+@Controller('cart')
 export class CartController {
-  constructor(private readonly cartService: CartService) {}
+  constructor(private readonly cartService: CartService) { }
 
   @Post()
-  addProduct(@Body() createCartDto: CreateCartDto) {
-    return this.cartService.create(createCartDto);
+  addProduct(@GetUser("id") userId: number, @Body() createCartDto: CreateCartDto) {
+    return this.cartService.addProduct(userId, createCartDto);
   }
 
   @Get()
-  findOne(@Param('userId', ParseIntPipe) id: number) {
-    return this.cartService.findOne(id);
+  getCart(@Param('userId', ParseIntPipe) id: number) {
+    return this.cartService.userCart(id);
   }
 
   @Delete(':productId')
-  remove(@Param('productId', ParseIntPipe) id: number) {
+  removeProduct(@Param('productId', ParseIntPipe) id: number) {
     return this.cartService.remove(id);
+  }
+
+  @Get("/:userId")
+  @Role(UserRole.ADMIN)
+  getUserCart(@Param("userId", ParseIntPipe) userId: number) {
+    return this.cartService.userCart(userId)
   }
 }

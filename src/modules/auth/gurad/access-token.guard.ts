@@ -6,8 +6,8 @@ import { JsonWebTokenError } from "@nestjs/jwt";
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
-    private readonly INVALID_TOKEN = "token is expired or invaid."
-    private readonly HEADER_NOT_VALID = "header is Empty or Its not Bearer"
+    private readonly INVALID_TOKEN = "token invaid."
+    private readonly HEADER_NOT_VALID = "header is Empty or its not Bearer."
     private readonly TOKEN_BLOCKED = "token is blocked"
 
     private logger = new Logger(AccessTokenGuard.name);
@@ -24,6 +24,7 @@ export class AccessTokenGuard implements CanActivate {
 
         try {
             const isBlocked = await this.blackListService.isInBlackList(token);
+
             if (isBlocked)
                 throw new ForbiddenException(this.TOKEN_BLOCKED);
 
