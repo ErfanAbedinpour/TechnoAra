@@ -329,6 +329,122 @@ DELETE http://localhost:3000/product/:id
 "Authorization": "Bearer ..."
 ```
 
+### Category
+
+#### Create
+
+```HTTP
+POST http://localhost:3000/category
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### FindAll
+
+```HTTP
+GET http://localhost:3000/category
+"Content-Type":"application/json"
+```
+
+#### FindOne
+
+```HTTP
+GET http://localhost:3000/category/:id
+"Content-Type":"application/json"
+```
+
+#### Update
+
+```HTTP
+PATCH http://localhost:3000/category/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### Delete
+
+```HTTP
+DELETE http://localhost:3000/category/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+### Brand
+
+#### Create
+
+```HTTP
+POST http://localhost:3000/brand
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### FindAll
+
+```HTTP
+GET http://localhost:3000/brand
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### FindOne
+
+```HTTP
+GET http://localhost:3000/brand/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### Update
+
+```HTTP
+PATCH http://localhost:3000/brand/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### Delete
+
+```HTTP
+DELETE http://localhost:3000/brand/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+### Cart
+
+#### Add Product
+
+```HTTP
+POST http://localhost:3000/cart
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### Show Cart
+
+```HTTP
+GET http://localhost:3000/cart
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### Get User Cart Information(Admin)
+
+```HTTP
+GET http://localhost:3000/cart/:userId
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### Remove Product Or Increment 1
+
+```HTTP
+DELETE http://localhost:3000/cart/:productId
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
 ## UI
 
 ### main Page:
@@ -342,3 +458,7 @@ DELETE http://localhost:3000/product/:id
 ### admin panel
 
 - https://undefineduser1381.github.io/Technoara/#/panel/dashboard
+
+```
+
+```
