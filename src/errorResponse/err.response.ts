@@ -13,4 +13,5 @@ export class ErrorMessages {
     static readonly INVALID_BRAND = "brand name is taken."
     static readonly PRODUCT_QUANTITY = "product is unavalible"
     static readonly PRODUCT_EXSIST_IN_YOUR_CART = "Product exsists in your cart."
+    static readonly PRODUCT_NOT_EXSIST_IN_YOUR_CART = "Product not exsist in your cart."
 }

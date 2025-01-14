@@ -1,10 +1,11 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { EntityManager } from '@mikro-orm/postgresql';
+import { EntityManager, NotFoundError } from '@mikro-orm/postgresql';
 import { ProductService } from '../product/product.service';
 import { CartProduct } from '../../models/cart-product.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { Cart } from '../../models/cart.model';
+import { User } from '../../models/user.model';
 
 @Injectable()
 export class CartService {
@@ -48,16 +49,43 @@ export class CartService {
     }
   }
 
-  showCart() {
-    return `This action returns all cart`;
-  }
-
-  userCart(userId: number) {
-    return `This action returns a #${userId} cart`;
+  errorHandler(err: Error) {
+    if (err instanceof NotFoundError)
+      throw new NotFoundException(ErrorMessages.USER_NOT_FOUND)
   }
 
 
-  remove(productId: number) {
-    return `This action removes a #${productId} cart`;
+  async getUserCart(userId: number) {
+    try {
+      // findAll User Cart Products
+      const userCart = await this.em.findAll(CartProduct, { where: { cart: { user: userId } }, populate: ["product"] });
+      return userCart
+    } catch (err) {
+      this.errorHandler(err)
+      this.logger.error(err)
+      throw new InternalServerErrorException()
+    }
+  }
+
+
+  async remove(productId: number, userId: number) {
+    const userCart = await this.em.findOne(CartProduct, { cart: { user: { id: userId } }, product: productId }, { populate: ['product'] });
+
+    if (!userCart)
+      throw new NotFoundException(ErrorMessages.PRODUCT_NOT_EXSIST_IN_YOUR_CART);
+
+    if (userCart.count > 1)
+      userCart.count--;
+    else
+      this.em.remove(userCart)
+
+    try {
+      await this.em.flush();
+
+      return userCart
+    } catch (err) {
+      this.logger.error(err)
+      throw new InternalServerErrorException()
+    }
   }
 }
