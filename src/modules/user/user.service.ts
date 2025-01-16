@@ -2,12 +2,11 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { UpdateUserDto, UpdateUserRespone } from './dto/update-user.dto';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { User } from '../../models/user.model';
-import { EntityManager, EntityRepository } from '@mikro-orm/postgresql';
+import { EntityManager } from '@mikro-orm/postgresql';
 import { Pagination } from '../../types/paggination.type';
 import { GetAllUserResponse, GetOneUserResponse } from './dto/get-user-response';
 import { PATH_TO_WRITE, writeToFile } from '../../uploader/writeToFile';
 import { RemoveUserResponse } from './dto/remove-user.dto';
-import { UserTokenService } from '../auth/tokens/user.token.service';
 
 @Injectable()
 export class UserService {
@@ -17,16 +16,14 @@ export class UserService {
 
   private logger = new Logger(UserService.name)
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: EntityRepository<User>,
-    private readonly em: EntityManager,
-    private readonly userTokenService: UserTokenService) { }
+    private readonly em: EntityManager
+  ) { }
 
 
   async findAll({ limit, page }: Pagination): Promise<GetAllUserResponse> {
 
     const offset = limit * (page - 1);
-    const [users, countAll] = await this.userRepository.findAndCount({}, { offset, limit });
+    const [users, countAll] = await this.em.findAndCount(User, {}, { offset, limit });
 
     return {
       users,
@@ -41,7 +38,7 @@ export class UserService {
 
   // find user by id 
   async findOne(id: number): Promise<GetOneUserResponse> {
-    const user = await this.userRepository.findOne({ id }, {
+    const user = await this.em.findOne(User, { id }, {
       populate: ["*"],
     })
 
@@ -52,7 +49,7 @@ export class UserService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<UpdateUserRespone> {
-    const user = await this.userRepository.findOne({ id });
+    const user = await this.em.findOne(User, { id });
 
     // check user is exsist or not
     if (!user)
@@ -67,7 +64,7 @@ export class UserService {
       }
       // validate email
       else if (prop === 'email' && updateUserDto[prop]) {
-        const isValidEmail = await this.userRepository.findOne({ email: updateUserDto.email });
+        const isValidEmail = await this.em.findOne(User, { email: updateUserDto.email });
         if (isValidEmail) {
           throw new ConflictException(this.INVALID_EMAIL)
         }
@@ -88,7 +85,7 @@ export class UserService {
   }
 
   async remove(id: number): Promise<RemoveUserResponse> {
-    const user = await this.userRepository.findOne({ id });
+    const user = await this.em.findOne(User, { id });
     if (!user)
       throw new NotFoundException(this.USER_NOT_FOUND)
 

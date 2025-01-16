@@ -147,10 +147,13 @@ describe('CartService', () => {
       expect(resPromise).rejects.toThrow(NotFoundException)
       expect(resPromise).rejects.toThrow(ErrorMessages.PRODUCT_NOT_EXSIST_IN_YOUR_CART)
     })
-
   })
 
 
+  afterAll(() => {
+
+
+  })
 
 
 });
