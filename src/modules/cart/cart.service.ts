@@ -5,7 +5,6 @@ import { ProductService } from '../product/product.service';
 import { CartProduct } from '../../models/cart-product.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { Cart } from '../../models/cart.model';
-import { User } from '../../models/user.model';
 
 @Injectable()
 export class CartService {
