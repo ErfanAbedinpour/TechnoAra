@@ -1,14 +1,20 @@
 import { Entity, ManyToOne, OneToOne, Property, Rel } from "@mikro-orm/core";
-import { State } from "./state.model";
+import { State } from "./province.model";
 import { BaseEntity } from "./base.entity";
 
 @Entity({ tableName: "cities" })
 export class City extends BaseEntity {
     @Property({ unique: true })
-    name!: string
+    title!: string
 
     @Property({ unique: true })
-    en_name: string
+    slug: string
+
+    @Property()
+    latitude: string
+    @Property()
+    longitude: string
+
     @ManyToOne(() => State, { unique: true })
-    state!: Rel<State>
+    province!: Rel<State>
 }
