@@ -4,6 +4,11 @@ import { UserFactory } from './factoryies.entity';
 import { Category } from '../models/category.model';
 import { mobile_brands } from './data.json'
 import { Brand } from '../models/brand.model';
+import { loadProvines } from './province/provice.load';
+import { Province } from '../models/province.model';
+import slugify from 'slugify';
+import { loadCities } from './cities/cities.load';
+import { City } from '../models/city.model';
 
 
 export class DatabaseSeeder extends Seeder {
@@ -59,7 +64,35 @@ export class DatabaseSeeder extends Seeder {
             en_name: "laptop",
             user: adminUser,
         })
+
+
+        const provines = await loadProvines()
+
+        provines.forEach(province => {
+            const { id, latitude, longitude, slug, title } = province;
+            em.create(Province, {
+                slug: slugify(slug, { lower: true, trim: true, replacement: "-" }),
+                id,
+                en_name: slug,
+                latitude,
+                longitude,
+                title
+            }, { persist: true })
+        })
+        await em.flush()
+
+        const cities = await loadCities();
+        cities.forEach(city => {
+            const { latitude, longitude, province_id, slug, title } = city;
+
+            em.create(City, {
+                en_name: slug,
+                slug: slugify(slug, { trim: true, replacement: '-', lower: true }),
+                province: { id: province_id },
+                latitude: String(latitude),
+                longitude: String(longitude),
+                title
+            })
+        })
     }
-
-
 }

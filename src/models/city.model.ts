@@ -1,13 +1,12 @@
-import { Entity, ManyToOne, OneToOne, Property, Rel } from "@mikro-orm/core";
+import { Entity, ManyToOne, OneToOne, PrimaryKey, Property, Rel } from "@mikro-orm/core";
 import { Province } from "./province.model";
-import { BaseEntity } from "./base.entity";
 
 @Entity({ tableName: "cities" })
-export class City extends BaseEntity {
+export class City {
     @Property({ unique: true })
     title!: string
 
-    @Property({ unique: true })
+    @PrimaryKey()
     slug: string
 
     @Property()
@@ -15,9 +14,11 @@ export class City extends BaseEntity {
 
     @Property()
     latitude: string
+
     @Property()
     longitude: string
 
-    @ManyToOne(() => Province, { unique: true })
+    @ManyToOne(() => Province, { primary: true })
     province!: Rel<Province>
+
 }

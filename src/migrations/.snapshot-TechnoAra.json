@@ -247,35 +247,8 @@
     },
     {
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": true,
-          "nullable": false,
-          "mappedType": "integer"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "bigint",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "bigint"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "bigint",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "bigint"
-        },
-        "title": {
-          "name": "title",
+        "slug": {
+          "name": "slug",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -284,8 +257,17 @@
           "length": 255,
           "mappedType": "string"
         },
-        "slug": {
-          "name": "slug",
+        "province_id": {
+          "name": "province_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "title": {
+          "name": "title",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -323,15 +305,6 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
-        },
-        "province_id": {
-          "name": "province_id",
-          "type": "int",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "integer"
         }
       },
       "name": "cities",
@@ -348,31 +321,12 @@
           "unique": true
         },
         {
-          "columnNames": [
-            "slug"
-          ],
-          "composite": false,
-          "keyName": "cities_slug_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "province_id"
-          ],
-          "composite": false,
-          "keyName": "cities_province_id_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "cities_pkey",
           "columnNames": [
-            "id"
+            "slug",
+            "province_id"
           ],
-          "composite": false,
+          "composite": true,
           "constraint": true,
           "primary": true,
           "unique": true
@@ -1880,13 +1834,24 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "city_id": {
-          "name": "city_id",
+        "city_slug": {
+          "name": "city_slug",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "city_province_id": {
+          "name": "city_province_id",
           "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "integer"
         },
         "user_id": {
@@ -1904,10 +1869,11 @@
       "indexes": [
         {
           "columnNames": [
-            "city_id"
+            "city_slug",
+            "city_province_id"
           ],
-          "composite": false,
-          "keyName": "addresses_city_id_unique",
+          "composite": true,
+          "keyName": "addresses_city_slug_city_province_id_unique",
           "constraint": true,
           "primary": false,
           "unique": true
@@ -1925,14 +1891,16 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "addresses_city_id_foreign": {
-          "constraintName": "addresses_city_id_foreign",
+        "addresses_city_slug_city_province_id_foreign": {
+          "constraintName": "addresses_city_slug_city_province_id_foreign",
           "columnNames": [
-            "city_id"
+            "city_slug",
+            "city_province_id"
           ],
           "localTableName": "public.addresses",
           "referencedColumnNames": [
-            "id"
+            "slug",
+            "province_id"
           ],
           "referencedTableName": "public.cities",
           "updateRule": "cascade"
