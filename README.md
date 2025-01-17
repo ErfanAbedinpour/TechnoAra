@@ -202,11 +202,11 @@ npm run test:e2e
 - [x] make code Pretty By SOLID principle
 - [x] Attribute Module for Added to special Product and Remove them
 - [ ] E2E test and unit test
-- [ ] Cart Module
+- [x] Cart Module
 - [x] category CRUD
 - [x] category Test
 - [x] Brand CRUD
-- [ ] Search product
+- [ ] Search 
 - [ ] Delete account
 - [ ] reset password
 - [ ] article
@@ -218,7 +218,7 @@ npm run test:e2e
 - [ ] orders
 - [ ] payment
 - [ ] Pricing Module for calculation price of product
-- [ ] Welcome Message By Send Email Notification
+- [ ] Welcome Message By Send Email Notification By Queue
 
 ## EndPoints
 

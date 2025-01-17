@@ -7,6 +7,9 @@ export class State extends BaseEntity {
     @Property({ unique: true })
     name!: string
 
+    @Property({ unique: true })
+    en_name: string
+
     @OneToMany(() => City, city => city.state)
     cities = new Collection<City>(this)
 }

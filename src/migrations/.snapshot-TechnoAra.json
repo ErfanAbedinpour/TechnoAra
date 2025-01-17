@@ -248,6 +248,16 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
+        },
+        "en_name": {
+          "name": "en_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "states",
@@ -259,6 +269,16 @@
           ],
           "composite": false,
           "keyName": "states_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "en_name"
+          ],
+          "composite": false,
+          "keyName": "states_en_name_unique",
           "constraint": true,
           "primary": false,
           "unique": true
@@ -317,6 +337,16 @@
           "length": 255,
           "mappedType": "string"
         },
+        "en_name": {
+          "name": "en_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
         "state_id": {
           "name": "state_id",
           "type": "int",
@@ -336,6 +366,16 @@
           ],
           "composite": false,
           "keyName": "cities_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "en_name"
+          ],
+          "composite": false,
+          "keyName": "cities_en_name_unique",
           "constraint": true,
           "primary": false,
           "unique": true
