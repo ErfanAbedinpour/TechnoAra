@@ -13,9 +13,8 @@ export class Address extends BaseEntity {
     @Property({ type: 'text' })
     street!: string
 
-    @OneToOne(() => City, { owner: true })
+    @OneToOne(() => City, { owner: true, unique: false })
     city!: Rel<City>
-
 
     @ManyToOne(() => User)
     user: Rel<User>

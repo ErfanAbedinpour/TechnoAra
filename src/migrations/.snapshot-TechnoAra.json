@@ -1870,17 +1870,6 @@
       "schema": "public",
       "indexes": [
         {
-          "columnNames": [
-            "city_slug",
-            "city_province_id"
-          ],
-          "composite": true,
-          "keyName": "addresses_city_slug_city_province_id_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "addresses_pkey",
           "columnNames": [
             "id"
