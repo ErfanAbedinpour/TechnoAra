@@ -74,8 +74,8 @@ export class DatabaseSeeder extends Seeder {
                 slug: slugify(slug, { lower: true, trim: true, replacement: "-" }),
                 id,
                 en_name: slug,
-                latitude,
-                longitude,
+                latitude: String(latitude),
+                longitude: String(longitude),
                 title
             }, { persist: true })
         })
