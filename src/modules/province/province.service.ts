@@ -36,9 +36,9 @@ export class ProvinceService {
     }
   }
 
-  async findProvinceById(id: number) {
+  async findProvinceBySlug(slug: string) {
     try {
-      return await this.em.findOneOrFail(Province, id);
+      return await this.em.findOneOrFail(Province, { slug });
     } catch (err) {
       this.errorHandler(err)
       this.logger.error(err)
@@ -80,5 +80,14 @@ export class ProvinceService {
       this.logger.error(err)
       throw new InternalServerErrorException()
     }
+  }
+
+  async findCityBySlug(slug: string) {
+    const [cities, count] = await this.em.findAndCount(Province, { slug }, { populate: ['cities'] });
+    return {
+      cities,
+      count
+    }
+
   }
 }
