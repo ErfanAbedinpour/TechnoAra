@@ -18,5 +18,6 @@ export class ErrorMessages {
     static readonly ADDRESS_NOT_FOUND = "Addresses Not Found"
     static readonly SLUG_UNIQUE = "slug is exsist before."
     static readonly PROVINCE_NOT_FOUND = "Province Not found"
-
+    static readonly PROVINCE_EMPTY = "province is empty"
+    static readonly CITY_EMPTY = "city is empty"
 }

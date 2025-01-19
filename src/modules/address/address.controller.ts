@@ -16,7 +16,7 @@ export class AddressController {
 
   @Get()
   findOne(@GetUser('id') userId: number) {
-    return this.addressService.getUserCities(userId);
+    return this.addressService.getUserAddresses(userId);
   }
 
   @Patch(':id')

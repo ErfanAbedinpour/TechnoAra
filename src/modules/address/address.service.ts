@@ -5,12 +5,13 @@ import { EntityManager, NotFoundError } from '@mikro-orm/postgresql';
 import { Address } from '../../models/address.model';
 import { City } from '../../models/city.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
+import { CityService } from '../province/city/city.service';
 
 @Injectable()
 export class AddressService {
   private readonly logger = new Logger(AddressService.name)
 
-  constructor(private readonly em: EntityManager) { }
+  constructor(private readonly em: EntityManager, private readonly cityService: CityService) { }
 
 
 
@@ -24,7 +25,7 @@ export class AddressService {
   async create(userId: number, { postal_code, city, province, street }: CreateAddressDto) {
 
     // find user City
-    const userCity = await this.em.findOne(City, { slug: city, province: { slug: province } });
+    const userCity = await this.cityService.getCity(province, city);
     // if city not found 
     if (!userCity)
       throw new NotFoundException(ErrorMessages.CITY_NOT_FOUND)
@@ -45,7 +46,7 @@ export class AddressService {
     }
   }
 
-  async getUserCities(userId: number) {
+  async getUserAddresses(userId: number) {
     // get user cities
     const addresses = await this.em.findAll(
       Address, {
@@ -59,27 +60,30 @@ export class AddressService {
 
   async update(addressId: number, updateAddressDto: UpdateAddressDto) {
 
+    const address = await this.em.findOne(Address, { id: addressId });
+
+    if (!address)
+      throw new NotFoundException(ErrorMessages.ADDRESS_NOT_FOUND)
+
+    if (updateAddressDto.city || updateAddressDto.province) {
+
+      if (!updateAddressDto.province || !updateAddressDto.city)
+        throw new BadRequestException(`${ErrorMessages.PROVINCE_EMPTY} or ${ErrorMessages.CITY_EMPTY}`);
+
+      // find user City
+      const userCity = await this.cityService.getCity(updateAddressDto.province, updateAddressDto.city)
+
+      address.city = userCity;
+    }
+
+    // updated value in address if value in dto is exsist
+    for (const key in updateAddressDto) {
+      if (key !== 'city' && key !== 'province') {
+        address[key] = updateAddressDto[key];
+      }
+    }
+
     try {
-      const address = await this.em.findOneOrFail(Address, { id: addressId });
-
-      if (updateAddressDto.city && updateAddressDto.province) {
-        // find user City
-        const userCity =
-          await this.em.findOne(City, { slug: updateAddressDto.city, province: { slug: updateAddressDto.province } })
-
-        if (!userCity)
-          throw new BadRequestException(ErrorMessages.CITY_NOT_FOUND)
-
-        address.city = userCity;
-      }
-
-      // updated value in address if value in dto is exsist
-      for (const key in updateAddressDto) {
-        if (key !== 'city' && key !== 'province') {
-          address[key] = updateAddressDto[key];
-        }
-      }
-
       await this.em.flush();
       return address
     } catch (err) {
