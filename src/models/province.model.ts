@@ -12,10 +12,10 @@ export class Province extends BaseEntity {
     slug: string
 
     @Property()
-    latitude: number
+    latitude: string
 
     @Property()
-    longitude: number
+    longitude: string
 
     @OneToMany(() => City, city => city.province)
     cities = new Collection<City>(this)
