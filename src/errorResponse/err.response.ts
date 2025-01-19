@@ -16,5 +16,7 @@ export class ErrorMessages {
     static readonly PRODUCT_NOT_EXSIST_IN_YOUR_CART = "Product not exsist in your cart."
     static readonly CITY_NOT_FOUND = "City is not found."
     static readonly ADDRESS_NOT_FOUND = "Addresses Not Found"
+    static readonly SLUG_UNIQUE = "slug is exsist before."
+    static readonly PROVINCE_NOT_FOUND = "Province Not found"
 
 }

@@ -9,9 +9,12 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+
   await app.get(MikroORM).getSchemaGenerator().ensureDatabase();
 
+  // set prefix 
   app.setGlobalPrefix("api")
+  // config for DocuemtnBuilder (swagger)
   const config = new DocumentBuilder()
     .setTitle('TechnoAra Api ')
     .setDescription('The technoAra API description')
