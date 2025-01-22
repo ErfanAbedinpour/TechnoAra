@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MikroORM } from '@mikro-orm/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -12,8 +12,14 @@ async function bootstrap() {
 
   await app.get(MikroORM).getSchemaGenerator().ensureDatabase();
 
-  // set prefix 
-  app.setGlobalPrefix("api")
+  // Set Prefix
+  app.setGlobalPrefix(process.env.PREFIX)
+  app.enableVersioning({
+    type: VersioningType.URI,
+    prefix: process.env.VERSION,
+    defaultVersion: process.env.VERSION
+
+  })
   // config for DocuemtnBuilder (swagger)
   const config = new DocumentBuilder()
     .setTitle('TechnoAra Api ')

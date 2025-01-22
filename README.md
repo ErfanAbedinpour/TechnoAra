@@ -201,11 +201,12 @@ npm run test:e2e
 - [x] Product
 - [x] make code Pretty By SOLID principle
 - [x] Attribute Module for Added to special Product and Remove them
-- [ ] E2E test and unit test
 - [x] Cart Module
 - [x] category CRUD
 - [x] category Test
 - [x] Brand CRUD
+- [] Uplaod Product image to Cloud storage with s3 protocol
+- [ ] E2E test and unit test
 - [ ] Search 
 - [ ] Delete account
 - [ ] reset password
