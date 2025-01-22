@@ -6,7 +6,7 @@ import { FilePayload } from './storages/storage.abstract';
 export class StorageService {
     constructor(private readonly s3Service: S3Storage) { }
 
-    async get(key: string) {
+    async get(key: string): Promise<string> {
         try {
             const result = await this.s3Service.get(key);
             return result
@@ -16,7 +16,7 @@ export class StorageService {
     }
 
 
-    async remove(key: string) {
+    async remove(key: string): Promise<boolean> {
         try {
             const isRemoved = this.s3Service.remove(key);
             return isRemoved
@@ -25,7 +25,7 @@ export class StorageService {
         }
     }
 
-    upload(payLoad: FilePayload) {
+    upload(payLoad: FilePayload): Promise<string> {
         try {
             return this.s3Service.upload(payLoad);
         } catch (e) {

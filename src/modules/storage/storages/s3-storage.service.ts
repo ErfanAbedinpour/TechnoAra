@@ -16,6 +16,7 @@ export class S3Storage implements Storage {
     private bucketName: string;
 
     constructor(@Inject(storageConfig.KEY) private config: ConfigType<typeof storageConfig>) {
+        // config S3 Client
         this.client = new S3Client(
             {
                 endpoint: config.endpoint,
@@ -30,6 +31,7 @@ export class S3Storage implements Storage {
     }
 
 
+    // uplaod object into cloud storage
     async upload({ fileName, filePath }: FilePayload): Promise<string> {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
@@ -48,6 +50,7 @@ export class S3Storage implements Storage {
     private async isFileExsist(key: string): Promise<boolean> {
         try {
 
+            // check object is exsist or not
             await this.client.send(new HeadObjectCommand({
                 Bucket: this.bucketName,
                 Key: key,
@@ -59,6 +62,7 @@ export class S3Storage implements Storage {
         }
     }
 
+    // get object 
     async get(key: string): Promise<string> {
 
         const command = new GetObjectCommand({
@@ -80,6 +84,7 @@ export class S3Storage implements Storage {
         }
     }
 
+    // remove object
     async remove(key: string): Promise<boolean> {
         try {
             const isFileExsist = await this.isFileExsist(key);
