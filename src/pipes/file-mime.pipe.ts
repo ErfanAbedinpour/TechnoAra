@@ -1,29 +1,25 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 
 @Injectable()
-export class FileSizeValidationPipe implements PipeTransform {
-    constructor(private imageKey: string[]) { }
+export class FileMimeValidationPipe implements PipeTransform {
+    constructor(private imageKey: string[], private valieMimes: string[]) { }
 
     transform(value: any, metadata: ArgumentMetadata) {
         // "value" is an object containing the file's attributes and metadata
-        const threeMb = 1024 * 1024 * 3
-
         for (const key of this.imageKey) {
-            const files = value[key];
+            const files = value[key]
+
             if (!files || !files.length)
                 continue;
-            // validate files size
+
             const res = files.every(file => {
-                return file.size < threeMb
+                return this.valieMimes.includes(file.mimetype)
             })
 
-            // if result not true throw Error
             if (!res)
-                throw new BadRequestException("file size must be lower than 3MB")
-
+                throw new BadRequestException(`file mimes must be in ${this.valieMimes}`)
         }
 
         return value;
-
     }
 }
