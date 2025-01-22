@@ -68,4 +68,9 @@ export class ProductController {
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.productService.remove(id);
   }
+
+  @Post(":id/images")
+  saveImage(@Param('id', ParseIntPipe) productId: number) {
+
+  }
 }
