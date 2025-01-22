@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -9,6 +9,10 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundRe
 import { Pagination } from '../../types/paggination.type';
 import { GetAllProductResponse } from './dto/get-product';
 import { SlugifyInterceptor } from '../../interceptor/slugify.interceptor';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { FileSizeValidationPipe } from '../../pipes/file-size.pipe';
+import { Auth, AUTH_STRATEGIES } from '../auth/decorator/auth.decorator';
+import { FileMimeValidationPipe } from '../../pipes/file-mime.pipe';
 
 @Controller('product')
 export class ProductController {
@@ -70,7 +74,22 @@ export class ProductController {
   }
 
   @Post(":id/images")
-  saveImage(@Param('id', ParseIntPipe) productId: number) {
+  @Auth(AUTH_STRATEGIES.NONE)
+  @UseInterceptors(FileFieldsInterceptor([
+    {
+      name: "main",
+      maxCount: 1
+    },
+    {
+      name: "product-gallery"
+    }
 
+  ]))
+  saveImages(@Param('id', ParseIntPipe) productId: number, @UploadedFiles(
+    new FileSizeValidationPipe(["main", "product-gallery"]),
+    new FileMimeValidationPipe(["main", "product-gallery"], ['image/jpeg', 'image/png'])
+  )
+  files: { main: Express.Multer.File[], productGallery: Express.Multer.File[] }) {
+    return this.productService.saveImages(productId, { main: files.main[0], gallery: files.productGallery })
   }
 }

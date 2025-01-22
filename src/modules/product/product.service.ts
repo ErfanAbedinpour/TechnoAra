@@ -243,4 +243,7 @@ export class ProductService {
       throw new InternalServerErrorException();
     }
   }
+
+
+  async saveImages(productId: number, images: { main: Express.Multer.File, gallery: Express.Multer.File[] }) { }
 }
