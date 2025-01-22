@@ -36,34 +36,4 @@ export class CityService {
 
     }
 
-    // // remove city
-    // async remove(provinceId: number, citySlug: string) {
-    //     try {
-    //         const city = await this.em.findOneOrFail(City, { province: provinceId, slug: citySlug })
-    //         await this.em.removeAndFlush(city);
-    //         return city
-    //     } catch (err) {
-    //         this.errorHandler(err)
-    //         throw new InternalServerErrorException()
-    //     }
-    // }
-
-    // // update city
-    // async update(provinceId: number, citySlug: string, updateCityDto: UpdateCityDto) {
-    //     try {
-    //         const city = await this.em.findOneOrFail(City, { province: provinceId, slug: citySlug }, { populate: ['province'] })
-
-    //         for (const key in updateCityDto) {
-    //             if (updateCityDto[key]) {
-    //                 city[key] = updateCityDto[key]
-    //             }
-    //         }
-    //         await this.em.flush()
-    //         return city;
-    //     } catch (err) {
-    //         this.errorHandler(err)
-    //         throw new InternalServerErrorException()
-    //     }
-
-    // }
 }

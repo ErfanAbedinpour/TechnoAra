@@ -82,12 +82,4 @@ export class ProvinceService {
     }
   }
 
-  async findCityBySlug(slug: string) {
-    const [cities, count] = await this.em.findAndCount(Province, { slug }, { populate: ['cities'] });
-    return {
-      cities,
-      count
-    }
-
-  }
 }

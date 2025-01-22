@@ -3,14 +3,13 @@ import { ProvinceService } from './province.service';
 import { UpdateProvinceDto } from './dto/update-province.dto';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
-import { CityService } from './city/city.service';
 import { Auth, AUTH_STRATEGIES } from '../auth/decorator/auth.decorator';
 
 
 @Controller('province')
 @Auth(AUTH_STRATEGIES.NONE)
 export class ProvinceController {
-  constructor(private readonly provinceService: ProvinceService, private readonly cityService: CityService) { }
+  constructor(private readonly provinceService: ProvinceService) { }
 
   @Get()
   findAll() {

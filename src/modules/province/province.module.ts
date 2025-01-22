@@ -1,4 +1,4 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ProvinceService } from './province.service';
 import { ProvinceController } from './province.controller';
 import { CityService } from './city/city.service';

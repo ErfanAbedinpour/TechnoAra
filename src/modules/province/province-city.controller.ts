@@ -1,5 +1,4 @@
 import { Controller, Get, Param } from "@nestjs/common";
-import { ProvinceService } from "./province.service";
 import { CityService } from "./city/city.service";
 import { Auth, AUTH_STRATEGIES } from "../auth/decorator/auth.decorator";
 

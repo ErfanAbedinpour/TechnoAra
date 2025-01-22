@@ -14,12 +14,12 @@ async function bootstrap() {
 
   // Set Prefix
   app.setGlobalPrefix(process.env.PREFIX)
+
   app.enableVersioning({
     type: VersioningType.URI,
-    prefix: process.env.VERSION,
     defaultVersion: process.env.VERSION
-
   })
+
   // config for DocuemtnBuilder (swagger)
   const config = new DocumentBuilder()
     .setTitle('TechnoAra Api ')
@@ -27,6 +27,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
+
   SwaggerModule.setup('doc', app, documentFactory);
 
   await app.listen(port, () => {
