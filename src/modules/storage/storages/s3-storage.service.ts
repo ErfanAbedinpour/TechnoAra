@@ -1,13 +1,17 @@
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, PutObjectAclCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Inject, Injectable } from "@nestjs/common";
 import storageConfig from "../config/storage.config";
 import { ConfigType } from "@nestjs/config";
-import { Storage } from "./storage.abstract";
+import { FilePayload, Storage } from "./storage.abstract";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { FileNotFound } from "../exception/notFound.exception";
+import { UnknownException } from "../exception/unknows.exception";
+
 
 
 @Injectable()
 export class S3Storage implements Storage {
+
     private client: S3Client
     private bucketName: string;
 
@@ -25,8 +29,34 @@ export class S3Storage implements Storage {
         this.bucketName = config.bucketName;
     }
 
-    async upload(): Promise<string> {
-        return ""
+
+    async upload({ fileName, filePath }: FilePayload): Promise<string> {
+        const command = new PutObjectCommand({
+            Bucket: this.bucketName,
+            Key: fileName,
+            Body: filePath,
+        })
+
+        try {
+            await this.client.send(command)
+            return `${this.config.endpoint}/${this.bucketName}/${fileName}`
+        } catch (err) {
+            throw new UnknownException(`error during upload file`);
+        }
+    }
+
+    private async isFileExsist(key: string): Promise<boolean> {
+        try {
+
+            await this.client.send(new HeadObjectCommand({
+                Bucket: this.bucketName,
+                Key: key,
+            }));
+            return true;
+
+        } catch (e) {
+            return false
+        }
     }
 
     async get(key: string): Promise<string> {
@@ -37,16 +67,38 @@ export class S3Storage implements Storage {
         })
 
         try {
-            const file = await getSignedUrl(this.client, command)
-            console.log(file);
-            return file;
+            const isFileExsist = await this.isFileExsist(key);
+            if (!isFileExsist)
+                throw new FileNotFound(`${key} not found`);
+
+            const url = await getSignedUrl(this.client, command)
+            return url;
         } catch (e) {
-            console.error(e)
-            throw e;
+            if (e instanceof FileNotFound)
+                throw e
+            throw new UnknownException(e)
         }
     }
 
-    async remove(key: string): Promise<string> {
-        return ""
+    async remove(key: string): Promise<boolean> {
+        try {
+            const isFileExsist = await this.isFileExsist(key);
+
+            if (!isFileExsist)
+                throw new FileNotFound(`${key} not found`);
+
+            const deleteParam = {
+                Bucket: this.bucketName,
+                Key: key,
+            };
+
+            await this.client.send(new DeleteObjectCommand(deleteParam))
+
+            return true;
+        } catch (e) {
+            if (e instanceof FileNotFound)
+                throw e
+            throw new UnknownException(e)
+        }
     }
 }
