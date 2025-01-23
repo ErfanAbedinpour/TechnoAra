@@ -1,7 +1,7 @@
 // upload file input payload
 export interface FilePayload {
-    fileName: string;
-    filePath: ReadableStream
+    key: string;
+    path: Buffer
 }
 
 

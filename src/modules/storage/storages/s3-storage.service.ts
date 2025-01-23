@@ -17,9 +17,10 @@ export class S3Storage implements Storage {
 
     constructor(@Inject(storageConfig.KEY) private config: ConfigType<typeof storageConfig>) {
         // config S3 Client
+
         this.client = new S3Client(
             {
-                endpoint: config.endpoint,
+                endpoint: 'https://' + config.endpoint,
                 region: "ir",
                 forcePathStyle: true,
                 credentials: {
@@ -32,20 +33,23 @@ export class S3Storage implements Storage {
 
 
     // uplaod object into cloud storage
-    async upload({ fileName, filePath }: FilePayload): Promise<string> {
+    async upload({ path, key }: FilePayload): Promise<string> {
+
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
-            Key: fileName,
-            Body: filePath,
+            Key: key,
+            Body: path,
         })
 
         try {
             await this.client.send(command)
-            return `${this.config.endpoint}/${this.bucketName}/${fileName}`
+            return `${this.config.endpoint}/${this.bucketName}/${key}`
         } catch (err) {
+            console.error(err);
             throw new UnknownException(`error during upload file`);
         }
     }
+
 
     private async isFileExsist(key: string): Promise<boolean> {
         try {

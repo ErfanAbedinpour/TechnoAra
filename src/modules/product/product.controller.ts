@@ -5,11 +5,11 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 import { Pagination } from '../../types/paggination.type';
 import { GetAllProductResponse } from './dto/get-product';
 import { SlugifyInterceptor } from '../../interceptor/slugify.interceptor';
-import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '../../pipes/file-size.pipe';
 import { Auth, AUTH_STRATEGIES } from '../auth/decorator/auth.decorator';
 import { FileMimeValidationPipe } from '../../pipes/file-mime.pipe';
@@ -81,15 +81,15 @@ export class ProductController {
       maxCount: 1
     },
     {
-      name: "product-gallery"
+      name: "product-gallery",
+      maxCount: 5
     }
-
   ]))
   saveImages(@Param('id', ParseIntPipe) productId: number, @UploadedFiles(
     new FileSizeValidationPipe(["main", "product-gallery"]),
     new FileMimeValidationPipe(["main", "product-gallery"], ['image/jpeg', 'image/png'])
   )
   files: { main: Express.Multer.File[], productGallery: Express.Multer.File[] }) {
-    return this.productService.saveImages(productId, { main: files.main[0], gallery: files.productGallery })
+    return this.productService.saveImages(productId, files);
   }
 }

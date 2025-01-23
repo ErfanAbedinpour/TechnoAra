@@ -8,14 +8,19 @@ import { DriverException, EntityManager, ForeignKeyConstraintViolationException,
 import { GetAllProductResponse } from './dto/get-product';
 import { Attribute } from '../../models/attribute.model';
 import { ProductAttribute } from '../../models/product-attribute.model';
-import { Brand } from '../../models/brand.model';
-import { BrandService } from '../brand/brand.service';
+import { ProductStorage } from './storage/product-storage.service';
+import { ProductImage } from '../../models/product-image';
 
 @Injectable()
 export class ProductService {
   private logger = new Logger(ProductService.name);
+
   constructor(
-    private readonly em: EntityManager) { }
+    private readonly em: EntityManager,
+    private readonly productStorage: ProductStorage
+
+
+  ) { }
 
   async getProductById(id: number) {
 
@@ -31,7 +36,6 @@ export class ProductService {
       throw new InternalServerErrorException();
     }
   }
-
 
   private mikroOrmErrorHandler(err: Error) {
     if (err instanceof DriverException) {
@@ -64,8 +68,6 @@ export class ProductService {
 
     }
   }
-
-
 
   async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductRespone> {
 
@@ -245,5 +247,42 @@ export class ProductService {
   }
 
 
-  async saveImages(productId: number, images: { main: Express.Multer.File, gallery: Express.Multer.File[] }) { }
+  async saveImages(productId: number, files: { main?: Express.Multer.File[], gallery?: Express.Multer.File[] }) {
+    // getProduct
+    const product = await this.getProductById(productId);
+    const promises: Promise<{ src: string, isMain?: boolean }>[] = []
+
+    if (files.main?.length) {
+      promises.push(
+        this.productStorage.saveProductImage(files.main[0], true)
+      )
+
+    }
+
+    if (files.gallery?.length) {
+      promises.push(
+        ...files.gallery.map(file => this.productStorage.saveProductImage(file))
+      );
+    }
+
+    // store File Into Cloud
+    try {
+      const responses = await Promise.all(promises);
+
+
+      for (const { src, isMain } of responses) {
+        this.em.create(ProductImage, {
+          product,
+          src,
+          isTitle: isMain ?? false
+        }, { persist: true })
+      }
+
+      await this.em.flush();
+
+      return responses
+    } catch (err) {
+      throw err;
+    }
+  }
 }
