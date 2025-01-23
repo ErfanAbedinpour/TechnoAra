@@ -52,5 +52,5 @@ export class Product extends BaseEntity {
     brand: Rel<Brand>
 
     @OneToMany(() => ProductImage, pi => pi.product)
-    products = new Collection<ProductImage>(this)
+    images = new Collection<ProductImage>(this)
 }

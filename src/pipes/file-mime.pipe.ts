@@ -1,11 +1,11 @@
 import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
 
 @Injectable()
-export class FileMimeValidationPipe implements PipeTransform {
+export class FileMimeValidationPipe<T> implements PipeTransform {
     constructor(private imageKey: string[], private valieMimes: string[]) { }
 
-    transform(value: any, metadata: ArgumentMetadata) {
-        // "value" is an object containing the file's attributes and metadata
+    transform(value: T, metadata: ArgumentMetadata) {
+
         for (const key of this.imageKey) {
             const files = value[key]
 

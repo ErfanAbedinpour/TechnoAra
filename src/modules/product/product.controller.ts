@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -13,6 +13,8 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '../../pipes/file-size.pipe';
 import { Auth, AUTH_STRATEGIES } from '../auth/decorator/auth.decorator';
 import { FileMimeValidationPipe } from '../../pipes/file-mime.pipe';
+import e from 'express';
+import { ErrorMessages } from '../../errorResponse/err.response';
 
 @Controller('product')
 export class ProductController {
@@ -81,15 +83,15 @@ export class ProductController {
       maxCount: 1
     },
     {
-      name: "product-gallery",
+      name: "product_gallery",
       maxCount: 5
     }
   ]))
   saveImages(@Param('id', ParseIntPipe) productId: number, @UploadedFiles(
-    new FileSizeValidationPipe(["main", "product-gallery"]),
-    new FileMimeValidationPipe(["main", "product-gallery"], ['image/jpeg', 'image/png'])
+    new FileSizeValidationPipe<{ main: Express.Multer.File, product_gallery: Express.Multer.File }>(["main", "product-gallery"]),
+    new FileMimeValidationPipe<{ main: Express.Multer.File, product_gallery: Express.Multer.File }>(["main", "product-gallery"], ['image/jpeg', 'image/png'])
   )
-  files: { main: Express.Multer.File[], productGallery: Express.Multer.File[] }) {
+  files: { main: Express.Multer.File[], product_gallery: Express.Multer.File[] }) {
     return this.productService.saveImages(productId, files);
   }
 }

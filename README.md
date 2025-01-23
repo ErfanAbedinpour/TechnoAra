@@ -207,7 +207,7 @@ npm run test:e2e
 - [x] Brand CRUD
 - [x] Storage Cloud Cofiguration
 - [x] Adding Product Image Table And use Key for main Image and other
-- [x] Adding Upload Image To Queue As Producer And Comsume that
+- [ ] Thorw an Error If Images Does not Exsist
 - [ ] Uplaod Product image to Cloud storage with s3 protocol
 - [ ] E2E test and unit test
 - [ ] Search 
@@ -329,6 +329,13 @@ PATCH http://localhost:3000/product/:id
 
 ```HTTP
 DELETE http://localhost:3000/product/:id
+"Content-Type":"application/json"
+"Authorization": "Bearer ..."
+```
+
+#### Added Image
+```HTTP
+POST http://localhost:3000/product/:id/images
 "Content-Type":"application/json"
 "Authorization": "Bearer ..."
 ```

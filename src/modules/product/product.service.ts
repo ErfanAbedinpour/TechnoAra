@@ -99,12 +99,13 @@ export class ProductService {
 
   async findAll(limit: number, page: number): Promise<GetAllProductResponse> {
     const offset = (page - 1) * limit;
+
     try {
       const [products, count] = await this.em.findAndCount(Product, { inventory: { $gte: 1 } }, {
         limit: limit,
         offset,
         fields: ["category.title", "user.username", "title", "slug", "price", "inventory", "brand.name"],
-        populate: ['category', 'brand'],
+        populate: ['category', 'brand', 'images'],
         orderBy: { id: "asc" }
       })
 
@@ -127,8 +128,8 @@ export class ProductService {
     try {
       // find product and join brand and category and orders and comments
       const product = await this.em.findOneOrFail(Product, { id }, {
-        exclude: ["attributes.product", "brand.user"],
-        populate: ['comments', "attributes", "brand", 'category', 'orders'],
+        exclude: ["attributes.product", "brand.user", "images.createdAt", 'images.updatedAt'],
+        populate: ['comments', "attributes", "brand", 'category', 'orders', 'images'],
         orderBy: { id: "asc" }
       });
 
@@ -247,7 +248,7 @@ export class ProductService {
   }
 
 
-  async saveImages(productId: number, files: { main?: Express.Multer.File[], gallery?: Express.Multer.File[] }) {
+  async saveImages(productId: number, files: { main?: Express.Multer.File[], product_gallery?: Express.Multer.File[] }) {
     // getProduct
     const product = await this.getProductById(productId);
     const promises: Promise<{ src: string, isMain?: boolean }>[] = []
@@ -259,14 +260,16 @@ export class ProductService {
 
     }
 
-    if (files.gallery?.length) {
+    if (files.product_gallery?.length) {
+      console.log(files.product_gallery)
       promises.push(
-        ...files.gallery.map(file => this.productStorage.saveProductImage(file))
+        ...files.product_gallery.map(file => this.productStorage.saveProductImage(file))
       );
     }
 
     // store File Into Cloud
     try {
+
       const responses = await Promise.all(promises);
 
 

@@ -20,4 +20,6 @@ export class ErrorMessages {
     static readonly PROVINCE_NOT_FOUND = "Province Not found"
     static readonly PROVINCE_EMPTY = "province is empty"
     static readonly CITY_EMPTY = "city is empty"
+
+    static readonly IMAGE_NOT_EXSISTS = "at least one image required"
 }
