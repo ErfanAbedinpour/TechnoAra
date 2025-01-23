@@ -205,8 +205,9 @@ npm run test:e2e
 - [x] category CRUD
 - [x] category Test
 - [x] Brand CRUD
-- [] Storage Cloud Cofiguration
-- [ ] Adding Product Image Table And use Key for main Image and other
+- [x] Storage Cloud Cofiguration
+- [x] Adding Product Image Table And use Key for main Image and other
+- [x] Adding Upload Image To Queue As Producer And Comsume that
 - [ ] Uplaod Product image to Cloud storage with s3 protocol
 - [ ] E2E test and unit test
 - [ ] Search 
