@@ -13,8 +13,9 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '../../pipes/file-size.pipe';
 import { Auth, AUTH_STRATEGIES } from '../auth/decorator/auth.decorator';
 import { FileMimeValidationPipe } from '../../pipes/file-mime.pipe';
-import e from 'express';
-import { ErrorMessages } from '../../errorResponse/err.response';
+import { IPrdouctImage } from './dto/product-image.type';
+import { ProductImage } from '../../models/product-image';
+import { FileKeysValidationPipe } from '../../pipes/file-keys.pipe';
 
 @Controller('product')
 export class ProductController {
@@ -88,10 +89,11 @@ export class ProductController {
     }
   ]))
   saveImages(@Param('id', ParseIntPipe) productId: number, @UploadedFiles(
-    new FileSizeValidationPipe<{ main: Express.Multer.File, product_gallery: Express.Multer.File }>(["main", "product-gallery"]),
-    new FileMimeValidationPipe<{ main: Express.Multer.File, product_gallery: Express.Multer.File }>(["main", "product-gallery"], ['image/jpeg', 'image/png'])
+    new FileKeysValidationPipe(['main', 'product_gallery']),
+    new FileSizeValidationPipe<IPrdouctImage>(["main", "product_gallery"]),
+    new FileMimeValidationPipe<IPrdouctImage>(["main", "product_gallery"], ['image/jpeg', 'image/png'])
   )
-  files: { main: Express.Multer.File[], product_gallery: Express.Multer.File[] }) {
+  files: IPrdouctImage) {
     return this.productService.saveImages(productId, files);
   }
 }

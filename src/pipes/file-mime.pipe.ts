@@ -7,7 +7,7 @@ export class FileMimeValidationPipe<T> implements PipeTransform {
     transform(value: T, metadata: ArgumentMetadata) {
 
         for (const key of this.imageKey) {
-            const files = value[key]
+            const files = value && value[key]
 
             if (!files || !files.length)
                 continue;

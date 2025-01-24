@@ -248,7 +248,7 @@ export class ProductService {
   }
 
 
-  async saveImages(productId: number, files: { main?: Express.Multer.File[], product_gallery?: Express.Multer.File[] }) {
+  async saveImages(productId: number, files: { main: Express.Multer.File[], product_gallery: Express.Multer.File[] }) {
     // getProduct
     const product = await this.getProductById(productId);
     const promises: Promise<{ src: string, isMain?: boolean }>[] = []

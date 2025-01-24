@@ -5,11 +5,12 @@ export class FileSizeValidationPipe<T> implements PipeTransform {
     constructor(private imageKey: string[]) { }
 
     transform(value: T, metadata: ArgumentMetadata) {
+
         const threeMb = 1024 * 1024 * 3
 
         for (const key of this.imageKey) {
 
-            const files = value[key];
+            const files = value && value[key];
 
             if (!files || !files.length)
                 continue;
