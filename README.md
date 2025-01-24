@@ -207,8 +207,9 @@ npm run test:e2e
 - [x] Brand CRUD
 - [x] Storage Cloud Cofiguration
 - [x] Adding Product Image Table And use Key for main Image and other
-- [ ] Thorw an Error If Images Does not Exsist
-- [ ] Uplaod Product image to Cloud storage with s3 protocol
+- [x] Thorw an Error If Images Does not Exsist
+- [x] Uplaod Product image to Cloud storage with s3 protocol
+- [x] Using Queue for Uploadint Image to Cloud Storage
 - [ ] E2E test and unit test
 - [ ] Search 
 - [ ] Delete account
