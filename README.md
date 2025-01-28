@@ -210,20 +210,22 @@ npm run test:e2e
 - [x] Thorw an Error If Images Does not Exsist
 - [x] Uplaod Product image to Cloud storage with s3 protocol
 - [x] Using Queue for Uploadint Image to Cloud Storage
-- [ ] E2E test and unit test
+- [ ] Ticket
+- [ ] dashborad
 - [ ] Search 
+- [ ] Pracing
 - [ ] Delete account
 - [ ] reset password
 - [ ] article
 - [ ] comment for product
 - [ ] comment for article
 - [ ] add blog or article to favirite
-- [ ] dashborad
 - [ ] User panel
 - [ ] orders
 - [ ] payment
 - [ ] Pricing Module for calculation price of product
 - [ ] Welcome Message By Send Email Notification By Queue
+- [ ] E2E test and unit test
 
 ## EndPoints
 
