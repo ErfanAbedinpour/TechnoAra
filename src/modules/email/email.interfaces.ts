@@ -1,4 +1,4 @@
-import { MailSubject } from './mail.subject.enum';
+import { MailSubject } from './enums/mail.subject.enum';
 
 export interface IEmail {
   subject: MailSubject;
