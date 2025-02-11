@@ -14,15 +14,7 @@ export class SendMailProcessor extends WorkerHost {
     }
 
     async process(job: Job<IEmail, boolean>): Promise<any> {
-        console.log("i am here");
-        console.log('job is ', job.data)
         await this.emailService.sendMail(job.data);
-    }
-
-
-    @OnWorkerEvent("completed")
-    onComplete() {
-        console.log("email send Successfully")
     }
 
 }
