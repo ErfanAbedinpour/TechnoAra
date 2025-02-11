@@ -9,9 +9,9 @@ import { IEmail } from './email.interfaces';
 export class EmailService {
   private readonly transport: Transporter;
   constructor(
-    @Inject(nodemailerConfig.KEY)
-    private config: ConfigType<typeof nodemailerConfig>,
+    @Inject(nodemailerConfig.KEY) private config: ConfigType<typeof nodemailerConfig>,
   ) {
+    console.log('cinfog is ', config)
     this.transport = createTransport({
       service: this.config.provider,
       auth: {
@@ -21,6 +21,7 @@ export class EmailService {
     });
   }
 
+  // send Mail 
   sendMail({ subject, html, to }: IEmail): Promise<boolean> {
     return this.transport.sendMail({
       from: 'technoAra.company@gmail.com',

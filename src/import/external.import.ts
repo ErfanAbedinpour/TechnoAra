@@ -4,21 +4,14 @@ import databaseConfig from "src/config/database.config";
 import config from '../mikro-orm.config'
 import { BullModule } from "@nestjs/bullmq";
 import redisConfig from "../config/redis.config";
+import { queueConfig } from "../config/queue.config";
+import { QUEUES } from "../enums/queues.enum";
 
 
 
 export const externalImports = [
     ConfigModule.forRoot({ cache: true, isGlobal: true, load: [databaseConfig, redisConfig] }),
     MikroOrmModule.forRoot(config),
-    BullModule.forRootAsync({
-        inject: [redisConfig.KEY],
-        useFactory: (config: ConfigType<typeof redisConfig>) => {
-            return {
-                connection: {
-                    host: config.host,
-                    port: +config.port
-                }
-            }
-        }
-    })
+    BullModule.forRoot(queueConfig),
+    BullModule.registerQueue({ name: QUEUES.WELCOME_EMAIL })
 ]

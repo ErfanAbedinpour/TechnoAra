@@ -18,12 +18,15 @@ import { AccessTokenGuard } from "./gurad/access-token.guard";
 import { RoleGurad } from "./gurad/role.guard";
 import { BlackListService } from "./blacklist/blacklist.service";
 import { ResponseSerializerInterceptor } from "../../interceptor/response-serializer.interceptor";
+import { BullModule } from "@nestjs/bullmq";
+import { QUEUES } from "../../enums/queues.enum";
 
 
 @Module({
     imports: [
         JwtModule.register({}),
         ConfigModule.forRoot({ load: [accessTokenConfig, refreshTokenConfig] }),
+        BullModule.registerQueue({ name: QUEUES.WELCOME_EMAIL })
     ],
     exports: [UserTokenService, BlackListService],
     providers: [

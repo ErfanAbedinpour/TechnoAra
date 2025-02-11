@@ -1,5 +1,6 @@
 export enum MailSubject {
-    RESETPASSWORD= "reset-password",
-    DELETEACCOUNT= "delete account verification Code"
+    WELCOME = "welcome to TechnoAra",
+    RESETPASSWORD = "reset-password",
+    DELETEACCOUNT = "delete account verification Code"
 }
 

@@ -20,8 +20,11 @@ import { JsonWebTokenError } from '@nestjs/jwt';
 import { BlackListService } from './blacklist/blacklist.service';
 import { LogoutResponse } from './dtos/user-logout-response';
 import { ErrorMessages } from '../../errorResponse/err.response';
-import { Cart } from '../../models/cart.model';
-import { Wallet } from '../../models/wallet.model';
+import { InjectQueue } from '@nestjs/bullmq';
+import { QUEUES } from '../../enums/queues.enum';
+import { Queue } from 'bullmq';
+import { sendMailJob } from '../email/jobs/send-mail.job';
+import { MailSubject } from '../email/enums/mail.subject.enum';
 
 @Injectable()
 export class AuthService {
@@ -32,6 +35,7 @@ export class AuthService {
     private readonly userToken: UserTokenService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly blackList: BlackListService,
+    @InjectQueue(QUEUES.WELCOME_EMAIL) readonly welcomeQueue: Queue
   ) { }
 
   async register({
@@ -55,7 +59,7 @@ export class AuthService {
       });
 
 
-      this.em.create(User, {
+      const user = this.em.create(User, {
         username,
         email,
         password,
@@ -63,6 +67,10 @@ export class AuthService {
       }, { persist: true });
 
       await this.em.flush();
+      const msg = `<h1> Welcome To TechnoAra </h1>
+      <h2> ${user.username} thanks for register in TechnoAra </h2>`
+      // send Data To Queue
+      await this.welcomeQueue.add("welcome-email", sendMailJob({ to: user.email, subject: MailSubject.WELCOME, html: msg }));
       return { success: true };
     } catch (err) {
       console.error(err);
