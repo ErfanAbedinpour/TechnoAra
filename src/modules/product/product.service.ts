@@ -8,8 +8,10 @@ import { DriverException, EntityManager, ForeignKeyConstraintViolationException,
 import { GetAllProductResponse } from './dto/get-product';
 import { Attribute } from '../../models/attribute.model';
 import { ProductAttribute } from '../../models/product-attribute.model';
-import { ProductStorage } from './storage/product-storage.service';
-import { ProductImage } from '../../models/product-image';
+import { InjectQueue } from '@nestjs/bullmq';
+import { QUEUES } from '../../enums/queues.enum';
+import { Queue } from 'bullmq';
+import { ImageJobCreator, ProductJobName, RemoveProductImageJob, UploadProductImageJob } from './job/product-file.job';
 
 @Injectable()
 export class ProductService {
@@ -17,9 +19,7 @@ export class ProductService {
 
   constructor(
     private readonly em: EntityManager,
-    private readonly productStorage: ProductStorage
-
-
+    @InjectQueue(QUEUES.PRODUCT_FILE) readonly queue: Queue
   ) { }
 
   async getProductById(id: number) {
@@ -207,6 +207,9 @@ export class ProductService {
     try {
       // find product 
       const product = await this.getProductById(id);
+      for (const img of product.images) {
+        await this.queue.add(ProductJobName.remove, ImageJobCreator<RemoveProductImageJob>({ key: img.src, productId: product.id }));
+      }
       // remove them
       await this.em.removeAndFlush(product)
       return product;
@@ -217,7 +220,6 @@ export class ProductService {
       throw new InternalServerErrorException()
     }
   }
-
 
   // remove product Attribute
   async removeAttribute(productId: number, attributeName: string): Promise<{ success: boolean }> {
@@ -251,39 +253,23 @@ export class ProductService {
   async saveImages(productId: number, files: { main: Express.Multer.File[], product_gallery: Express.Multer.File[] }) {
     // getProduct
     const product = await this.getProductById(productId);
-    const promises: Promise<{ src: string, isMain?: boolean }>[] = []
 
     if (files.main?.length) {
-      promises.push(
-        this.productStorage.saveProductImage(files.main[0], true)
-      )
-
+      await this.queue.add(ProductJobName.upload, ImageJobCreator<UploadProductImageJob>({ file: files.main[0], productId: product.id, isTitle: true }), {
+        attempts: 3,
+      })
     }
 
     if (files.product_gallery?.length) {
-      console.log(files.product_gallery)
-      promises.push(
-        ...files.product_gallery.map(file => this.productStorage.saveProductImage(file))
-      );
+
+      files.product_gallery.forEach(async (file) =>
+        await this.queue.add(ProductJobName.upload, ImageJobCreator<UploadProductImageJob>({ file: file, productId: product.id, isTitle: false })
+        ))
     }
 
     // store File Into Cloud
     try {
-
-      const responses = await Promise.all(promises);
-
-
-      for (const { src, isMain } of responses) {
-        this.em.create(ProductImage, {
-          product,
-          src,
-          isTitle: isMain ?? false
-        }, { persist: true })
-      }
-
-      await this.em.flush();
-
-      return responses
+      return { success: true, msg: "image uploaded successfully" }
     } catch (err) {
       throw err;
     }

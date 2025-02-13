@@ -1,4 +1,7 @@
 import { MikroOrmModule } from "@mikro-orm/nestjs";
+
+
+
 import { ConfigModule, ConfigType } from "@nestjs/config";
 import databaseConfig from "src/config/database.config";
 import config from '../mikro-orm.config'
@@ -13,5 +16,6 @@ export const externalImports = [
     ConfigModule.forRoot({ cache: true, isGlobal: true, load: [databaseConfig, redisConfig] }),
     MikroOrmModule.forRoot(config),
     BullModule.forRoot(queueConfig),
-    BullModule.registerQueue({ name: QUEUES.WELCOME_EMAIL })
+    BullModule.registerQueue({ name: QUEUES.WELCOME_EMAIL }),
+    BullModule.registerQueue({ name: QUEUES.PRODUCT_FILE })
 ]

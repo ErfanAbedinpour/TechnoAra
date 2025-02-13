@@ -11,7 +11,6 @@ export class EmailService {
   constructor(
     @Inject(nodemailerConfig.KEY) private config: ConfigType<typeof nodemailerConfig>,
   ) {
-    console.log('cinfog is ', config)
     this.transport = createTransport({
       service: this.config.provider,
       auth: {

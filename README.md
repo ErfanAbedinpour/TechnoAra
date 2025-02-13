@@ -210,6 +210,7 @@ npm run test:e2e
 - [x] Thorw an Error If Images Does not Exsist
 - [x] Uplaod Product image to Cloud storage with s3 protocol
 - [x] Using Queue for Uploadint Image to Cloud Storage
+- [x] Added Product Image into queue for uploading into Storage
 - [ ] Ticket
 - [ ] dashborad
 - [ ] Search 

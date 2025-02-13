@@ -16,10 +16,10 @@ export class StorageService {
     }
 
 
-    async remove(key: string): Promise<boolean> {
+    async remove(key: string): Promise<string> {
         try {
-            const isRemoved = this.s3Service.remove(key);
-            return isRemoved
+            const removedKey = this.s3Service.remove(key);
+            return removedKey
         } catch (e) {
             throw e
         }

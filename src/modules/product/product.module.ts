@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
 import { StorageModule } from '../storage/storage.module';
-import { ProductStorage } from './storage/product-storage.service';
+import { ProductImageProcessor } from './processor/product-storage.service';
+import { BullModule } from '@nestjs/bullmq';
+import { QUEUES } from '../../enums/queues.enum';
 
 @Module({
-  imports: [StorageModule],
+  imports: [StorageModule, BullModule.registerQueue({ name: QUEUES.PRODUCT_FILE })],
   exports: [ProductService],
   controllers: [ProductController],
-  providers: [ProductService, ProductStorage],
+  providers: [ProductService, ProductImageProcessor],
 })
 export class ProductModule { }

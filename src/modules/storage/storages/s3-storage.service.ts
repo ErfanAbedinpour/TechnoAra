@@ -33,16 +33,15 @@ export class S3Storage implements Storage {
 
 
     // uplaod object into cloud storage
-    async upload({ path, key }: FilePayload): Promise<string> {
-
+    async upload({ body, key }: FilePayload): Promise<string> {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: key,
-            Body: path,
+            Body: Buffer.isBuffer(body) ? body : Buffer.from(body),
         })
 
         try {
-            await this.client.send(command)
+            const response = await this.client.send(command)
             return `${this.config.endpoint}/${this.bucketName}/${key}`
         } catch (err) {
             console.error(err);
@@ -89,7 +88,7 @@ export class S3Storage implements Storage {
     }
 
     // remove object
-    async remove(key: string): Promise<boolean> {
+    async remove(key: string): Promise<string> {
         try {
             const isFileExsist = await this.isFileExsist(key);
 
@@ -103,7 +102,7 @@ export class S3Storage implements Storage {
 
             await this.client.send(new DeleteObjectCommand(deleteParam))
 
-            return true;
+            return `${this.config.endpoint}/${this.bucketName}/${key}`
         } catch (e) {
             if (e instanceof FileNotFound)
                 throw e

@@ -1,7 +1,7 @@
 // upload file input payload
 export interface FilePayload {
     key: string;
-    path: Buffer
+    body: Buffer
 }
 
 
@@ -10,5 +10,5 @@ export abstract class Storage {
 
     abstract get(key: string): Promise<string>
 
-    abstract remove(key: string): Promise<boolean>
+    abstract remove(key: string): Promise<string>
 }
