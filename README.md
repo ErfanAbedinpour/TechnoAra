@@ -211,6 +211,7 @@ npm run test:e2e
 - [x] Uplaod Product image to Cloud storage with s3 protocol
 - [x] Using Queue for Uploadint Image to Cloud Storage
 - [x] Added Product Image into queue for uploading into Storage
+- [x] Remove Product Image when product deleted from cloud storage 
 - [ ] Ticket
 - [ ] dashborad
 - [ ] Search 
