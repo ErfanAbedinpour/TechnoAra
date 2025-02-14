@@ -1,20 +1,6 @@
-export enum ProductJobName {
-    remove = 'remove',
-    upload = 'upload'
-}
+import { RemoveProductImageJob, UploadProductImageJob } from "../interface/job.interface";
 
-export interface UploadProductImageJob {
-    file: Express.Multer.File,
-    productId: number;
-    isTitle?: boolean
-}
-
-export interface RemoveProductImageJob {
-    key: string,
-    productId: number
-}
-
-export function ImageJobCreator<T>(data: T) {
+export function ImageJobCreator<T extends UploadProductImageJob | RemoveProductImageJob>(data: T) {
     return data;
 }
 

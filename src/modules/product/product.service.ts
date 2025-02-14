@@ -11,7 +11,8 @@ import { ProductAttribute } from '../../models/product-attribute.model';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QUEUES } from '../../enums/queues.enum';
 import { Queue } from 'bullmq';
-import { ImageJobCreator, ProductJobName, RemoveProductImageJob, UploadProductImageJob } from './job/product-file.job';
+import { ProductJobName, RemoveProductImageJob, UploadProductImageJob } from './interface/job.interface';
+import { ImageJobCreator } from './job/product-file.job';
 
 @Injectable()
 export class ProductService {
@@ -105,7 +106,7 @@ export class ProductService {
         limit: limit,
         offset,
         fields: ["category.title", "user.username", "title", "slug", "price", "inventory", "brand.name"],
-        populate: ['category', 'brand', 'images'],
+        populate: ['category', 'brand', 'images.isTitle', 'images.src'],
         orderBy: { id: "asc" }
       })
 
@@ -204,18 +205,19 @@ export class ProductService {
   }
 
   async remove(id: number) {
+    // find product 
     try {
-      // find product 
-      const product = await this.getProductById(id);
+      const product = await this.em.findOneOrFail(Product, id, { populate: ['images.src'] });
+
       for (const img of product.images) {
+        console.log('product image is : ', img)
         await this.queue.add(ProductJobName.remove, ImageJobCreator<RemoveProductImageJob>({ key: img.src, productId: product.id }));
       }
       // remove them
       await this.em.removeAndFlush(product)
       return product;
     } catch (err) {
-      if (err instanceof NotFoundError)
-        throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND)
+      this.mikroOrmErrorHandler(err)
       this.logger.error(err)
       throw new InternalServerErrorException()
     }

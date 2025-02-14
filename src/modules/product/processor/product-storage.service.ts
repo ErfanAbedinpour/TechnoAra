@@ -5,9 +5,9 @@ import { extname } from "path";
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { QUEUES } from "../../../enums/queues.enum";
 import { Job } from "bullmq";
-import { ProductJobName, RemoveProductImageJob, UploadProductImageJob } from "../job/product-file.job";
 import { EntityManager } from "@mikro-orm/postgresql";
 import { ProductImage } from "../../../models/product-image";
+import { ProductJobName, RemoveProductImageJob, UploadProductImageJob } from "../interface/job.interface";
 
 
 
@@ -29,15 +29,12 @@ export class ProductImageProcessor extends WorkerHost {
         switch (jobNames) {
 
             case ProductJobName.remove: {
-                console.log('i am in remove ')
                 const data = job.data as RemoveProductImageJob;
                 // remove product image in cloud storage
                 const removedKey = await this.storage.remove(data.key);
 
-                console.log("Remove result is ", removedKey);
                 //also remove from database
                 const productRemoveImage = em.findOne(ProductImage, { product: data.productId, src: removedKey });
-                console.log("this should be remove", productRemoveImage)
 
                 if (!productRemoveImage)
                     em.removeAndFlush(productRemoveImage)
