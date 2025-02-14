@@ -341,7 +341,7 @@ DELETE http://localhost:3000/product/:id
 #### Added Image
 ```HTTP
 POST http://localhost:3000/product/:id/images
-"Content-Type":"application/json"
+"Content-Type":"multipart/form-data"
 "Authorization": "Bearer ..."
 ```
 

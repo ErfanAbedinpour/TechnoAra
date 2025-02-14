@@ -14,7 +14,6 @@ import { FileSizeValidationPipe } from '../../pipes/file-size.pipe';
 import { Auth, AUTH_STRATEGIES } from '../auth/decorator/auth.decorator';
 import { FileMimeValidationPipe } from '../../pipes/file-mime.pipe';
 import { IPrdouctImage } from './dto/product-image.type';
-import { ProductImage } from '../../models/product-image';
 import { FileKeysValidationPipe } from '../../pipes/file-keys.pipe';
 
 @Controller('product')
@@ -77,7 +76,9 @@ export class ProductController {
   }
 
   @Post(":id/images")
-  @Auth(AUTH_STRATEGIES.NONE)
+  @Role(UserRole.ADMIN)
+  @ApiCreatedResponse({ description: "image uploaded successfully" })
+  @ApiNotFoundResponse({ description: "product not found" })
   @UseInterceptors(FileFieldsInterceptor([
     {
       name: "main",
