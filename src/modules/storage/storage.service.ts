@@ -18,8 +18,7 @@ export class StorageService {
 
     async remove(key: string): Promise<string> {
         try {
-            const removedKey = this.s3Service.remove(key);
-            return removedKey
+            return this.s3Service.remove(key);
         } catch (e) {
             throw e
         }

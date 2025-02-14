@@ -41,8 +41,8 @@ export class S3Storage implements Storage {
         })
 
         try {
-            const response = await this.client.send(command)
-            return `${this.config.endpoint}/${this.bucketName}/${key}`
+            await this.client.send(command)
+            return this.keyToUrl(key);
         } catch (err) {
             console.error(err);
             throw new UnknownException(`error during upload file`);
@@ -75,6 +75,7 @@ export class S3Storage implements Storage {
 
         try {
             const isFileExsist = await this.isFileExsist(key);
+
             if (!isFileExsist)
                 throw new FileNotFound(`${key} not found`);
 
@@ -90,23 +91,38 @@ export class S3Storage implements Storage {
     // remove object
     async remove(key: string): Promise<string> {
         try {
-            const isFileExsist = await this.isFileExsist(key);
+
+            const orgKey = this.urlToKey(key);
+
+            const isFileExsist = await this.isFileExsist(orgKey);
+
 
             if (!isFileExsist)
-                throw new FileNotFound(`${key} not found`);
+                throw new FileNotFound(`${orgKey} not found`);
 
             const deleteParam = {
                 Bucket: this.bucketName,
-                Key: key,
+                Key: orgKey,
             };
 
             await this.client.send(new DeleteObjectCommand(deleteParam))
 
-            return `${this.config.endpoint}/${this.bucketName}/${key}`
+            return key;
         } catch (e) {
             if (e instanceof FileNotFound)
                 throw e
             throw new UnknownException(e)
         }
+    }
+
+    private keyToUrl(key: string) {
+        return `${this.config.endpoint}/${this.bucketName}/${key}`
+    }
+
+    private urlToKey(url: string) {
+        /* 
+        c360023.parspack.net/c360023/product/882049321927273000.jpg => product/882049321927273000.jpg
+        */
+        return url.split('/').splice(2).join("/");
     }
 }
