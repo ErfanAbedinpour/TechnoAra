@@ -1,40 +1,43 @@
-import { Entity, Enum, ManyToMany, ManyToOne, OneToMany, Property, Rel } from "@mikro-orm/core";
-import { v4 } from 'uuid'
+import {
+    Entity,
+    Enum,
+    ManyToOne,
+    Property,
+    Rel,
+} from "@mikro-orm/core";
+import { v4 } from "uuid";
 import { User } from "./user.model";
 import { BaseEntity } from "./base.entity";
 
-@Entity({ tableName: 'tickets' })
+@Entity({ tableName: "tickets" })
 export class Ticket extends BaseEntity {
-    @Property()
-    title!: string
+    @Property({ nullable: false })
+    title!: string;
 
-    @Property({ type: 'text' })
-    body!: string
+    @Property({ type: "text", nullable: false })
+    body!: string;
 
-    @Enum({ items: () => TicketStatus })
-    status = TicketStatus.OPEN
+    @Enum({ items: () => TicketStatus, nullable: false })
+    status = TicketStatus.OPEN;
 
-    @Enum(() => TicketDepartment)
-    department!: TicketDepartment
+    @Enum({ items: () => TicketDepartment, nullable: false })
+    department!: TicketDepartment;
 
-    @Property({ type: 'uuid', unique: true })
-    identify = v4()
+    @Property({ type: "uuid", unique: true, nullable: false })
+    identify = v4();
 
-    @ManyToOne(() => User)
-    user!: Rel<User>
+    @ManyToOne(() => User, { nullable: false, deleteRule: "set null", updateRule: "cascade" })
+    user!: Rel<User>;
 }
-
-
 
 export enum TicketStatus {
-    OPEN = 'open',
+    OPEN = "open",
     CLOSE = "closed",
-    IN_PROGRESS = "In Progress"
+    IN_PROGRESS = "In Progress",
 }
-
 
 export enum TicketDepartment {
     finance = "finance",
     support = "support",
-    sales = "sales"
+    sales = "sales",
 }

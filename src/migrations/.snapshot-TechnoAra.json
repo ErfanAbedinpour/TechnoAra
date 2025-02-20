@@ -828,6 +828,7 @@
             "id"
           ],
           "referencedTableName": "public.users",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },
