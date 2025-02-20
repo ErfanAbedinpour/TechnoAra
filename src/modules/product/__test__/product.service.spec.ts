@@ -10,17 +10,22 @@ import { Brand } from '../../../models/brand.model';
 import { Category } from '../../../models/category.model';
 import { Role, UserRole } from '../../../models/role.model';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { mock } from 'jest-mock-extended';
 import { ErrorMessages } from '../../../errorResponse/err.response';
+import { Queue } from 'bullmq';
+import { QUEUES } from '../../../enums/queues.enum';
+import { BullModule } from '@nestjs/bullmq';
 
 
 describe('ProductService', () => {
   let service: ProductService;
   let em: EntityManager
   let product: Product;
+  let bull = mock<Queue>()
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [MikroOrmModule.forRoot(DB_TEST_CONFIG)],
+      imports: [BullModule.registerQueue({ name: QUEUES.PRODUCT_FILE }), MikroOrmModule.forRoot(DB_TEST_CONFIG)],
       providers: [ProductService],
     }).compile();
 

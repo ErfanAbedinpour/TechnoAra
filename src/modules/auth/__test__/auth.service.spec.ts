@@ -13,6 +13,8 @@ import { BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { Role, UserRole } from "../../../models/role.model";
 import { ErrorMessages } from "../../../errorResponse/err.response";
 import { DB_TEST_CONFIG } from "../../../config/db.test.config";
+import { BullModule } from "@nestjs/bullmq";
+import { QUEUES } from "../../../enums/queues.enum";
 
 describe("auth service", function () {
 
@@ -26,6 +28,7 @@ describe("auth service", function () {
 	beforeAll(async () => {
 		const moduelRef = await Test.createTestingModule({
 			imports: [
+				BullModule.registerQueue({ name: QUEUES.WELCOME_EMAIL }),
 				MikroOrmModule.forRoot(DB_TEST_CONFIG),
 			],
 			providers: [
