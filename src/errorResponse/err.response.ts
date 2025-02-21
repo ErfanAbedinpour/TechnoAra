@@ -21,4 +21,5 @@ export class ErrorMessages {
     static readonly PROVINCE_EMPTY = "province is empty"
     static readonly CITY_EMPTY = "city is empty"
     static readonly IMAGE_NOT_EXSISTS = "at least one image required"
+    static readonly TICKET_NOT_FOUND = "ticket not found"
 }

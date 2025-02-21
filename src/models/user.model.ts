@@ -19,13 +19,13 @@ export class User extends BaseEntity {
     private hashService = new ArgonService()
 
     @Property({ unique: true, nullable: false })
-    email!: string
+    email: string
 
     @Property()
-    username!: string
+    username: string
 
     @Property({ hidden: true, lazy: true, nullable: false })
-    password!: string
+    password: string
 
     @OneToOne({ entity: () => Role, nullable: false, fieldName: "role_id", owner: true, deleteRule: "set default", unique: false })
     role: Rel<Role>
