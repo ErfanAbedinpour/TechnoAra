@@ -212,6 +212,7 @@ npm run test:e2e
 - [x] Using Queue for Uploadint Image to Cloud Storage
 - [x] Added Product Image into queue for uploading into Storage
 - [x] Remove Product Image when product deleted from cloud storage 
+- [ ]  Added ApiPropery Decorator into Entities 
 - [ ] Ticket
 - [ ] dashborad
 - [ ] Search 
