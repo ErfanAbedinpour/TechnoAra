@@ -79,6 +79,7 @@ export class TicketService {
     }
 
 
+
     async update(updateDto: UpdateTicketDto, id: number) {
         const ticket = await this.findById(id);
         try {
@@ -89,4 +90,5 @@ export class TicketService {
             this.mikroOrmErrorHandler(err)
         }
     }
+
 }
