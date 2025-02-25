@@ -76,9 +76,9 @@ export class TicketService {
         return tickets;
     }
 
-    async remove(id: number) {
-        const ticket = await this.findById(id);
+    async remove(id: number, userId: number) {
         try {
+            const ticket = await this.em.findOneOrFail(Ticket, { user: userId, id });
             await this.em.removeAndFlush(ticket);
             return ticket;
         } catch (err) {
@@ -88,9 +88,10 @@ export class TicketService {
         }
     }
 
-    async update(updateDto: UpdateTicketDto, id: number) {
-        const ticket = await this.findById(id);
+    async update(updateDto: UpdateTicketDto, id: number, userId: number) {
         try {
+            const ticket = await this.em.findOneOrFail(Ticket, { user: userId, id });
+
             const newTicket = wrap(ticket).assign(updateDto);
             await this.em.flush();
             return newTicket;
