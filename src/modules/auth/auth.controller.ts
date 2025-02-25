@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpException, HttpStatus, Post, Req } from
 import { RegisterUserDto, RegisterUserResponse } from "./dtos/user.register";
 import { AuthService } from "./auth.service";
 import { UserLoginDto, UserLoginResponse } from "./dtos/user.login";
-import { RefreshTokenDto, RefreshTokenResponse } from "./dtos/refresh.token.dto";
+import { LogoutDto, RefreshTokenDto, RefreshTokenResponse } from "./dtos/refresh.token.dto";
 import { Auth, AUTH_STRATEGIES } from "./decorator/auth.decorator";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetUser } from "./decorator/get-user.decorator";
@@ -52,7 +52,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @ResponseStructure(LogoutResponse)
     @Post('logout')
-    logout(@GetUser('id') userId: number, @GetUser('tokenId') tokenId: string, @Req() req: Request): Promise<LogoutResponse> {
-        return this.service.logout(tokenId, userId, req.token);
+    logout(@Body() logoutDto: LogoutDto): Promise<LogoutResponse> {
+        return this.service.logout(logoutDto);
     }
 }

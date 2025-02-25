@@ -21,5 +21,6 @@ export const internalImports = [
     CartModule,
     AddressModule,
     ProvinceModule,
-    StorageModule
+    StorageModule,
+
 ];

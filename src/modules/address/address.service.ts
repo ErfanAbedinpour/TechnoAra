@@ -22,10 +22,11 @@ export class AddressService {
     throw err;
   }
 
-  async create(userId: number, { postal_code, city, province, street }: CreateAddressDto) {
+  async create(userId: number, { postal_code, city_slug, province_slug, street }: CreateAddressDto) {
 
     // find user City
-    const userCity = await this.cityService.getCity(province, city);
+    const userCity = await this.cityService.getCity(province_slug, city_slug);
+
     // if city not found 
     if (!userCity)
       throw new NotFoundException(ErrorMessages.CITY_NOT_FOUND)
@@ -65,13 +66,13 @@ export class AddressService {
     if (!address)
       throw new NotFoundException(ErrorMessages.ADDRESS_NOT_FOUND)
 
-    if (updateAddressDto.city || updateAddressDto.province) {
+    if (updateAddressDto.city_slug || updateAddressDto.province_slug) {
 
-      if (!updateAddressDto.province || !updateAddressDto.city)
+      if (!updateAddressDto.province_slug || !updateAddressDto.city_slug)
         throw new BadRequestException(`${ErrorMessages.PROVINCE_EMPTY} or ${ErrorMessages.CITY_EMPTY}`);
 
       // find user City
-      const userCity = await this.cityService.getCity(updateAddressDto.province, updateAddressDto.city)
+      const userCity = await this.cityService.getCity(updateAddressDto.province_slug, updateAddressDto.city_slug)
 
       address.city = userCity;
     }

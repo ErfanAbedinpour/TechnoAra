@@ -42,10 +42,6 @@ import { QUEUES } from "../../enums/queues.enum";
             provide: APP_GUARD,
             useClass: RoleGurad
         },
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: ResponseSerializerInterceptor
-        },
         AuthService,
         AccessTokenService,
         RefreshTokenService,

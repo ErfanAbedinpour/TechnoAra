@@ -6,13 +6,13 @@ export class BlackListService {
     constructor(private readonly redis: RedisRepository) { }
 
 
-    async setToBlackList(token: string, ttl?: number): Promise<void> {
-        await this.redis.set(this.getKey(token), 'true', ttl ? ttl : 30 * 60);
+    async setToBlackList(accessToken: string, ttl?: number): Promise<void> {
+        await this.redis.set(this.getKey(accessToken), 'true', ttl ? ttl : 30 * 60);
         return;
     }
 
-    async isInBlackList(token: string): Promise<boolean> {
-        const res = await this.redis.get(this.getKey(token))
+    async isInBlackList(accessToken: string): Promise<boolean> {
+        const res = await this.redis.get(this.getKey(accessToken))
         return !!res
     }
 

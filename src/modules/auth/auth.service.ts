@@ -12,8 +12,8 @@ import { User } from '../../models/user.model';
 import { UserLoginDto, UserLoginResponse } from './dtos/user.login';
 import { HashService } from './hashingServices/hash.service';
 import { UserTokenService } from './tokens/user.token.service';
-import { RefreshTokenDto } from './dtos/refresh.token.dto';
-import { RefreshTokenService } from './tokens/refreshToken.service';
+import { LogoutDto, RefreshTokenDto } from './dtos/refresh.token.dto';
+import { RefreshTokenPayload, RefreshTokenService } from './tokens/refreshToken.service';
 import { Role } from './decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
 import { JsonWebTokenError } from '@nestjs/jwt';
@@ -25,6 +25,8 @@ import { QUEUES } from '../../enums/queues.enum';
 import { Queue } from 'bullmq';
 import { sendMailJob } from '../email/jobs/send-mail.job';
 import { MailSubject } from '../email/enums/mail.subject.enum';
+import { plainToInstance } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
 
 @Injectable()
 export class AuthService {
@@ -133,19 +135,23 @@ export class AuthService {
   }
 
   async logout(
-    tokenId: string,
-    userId: number,
-    token: string,
+    { accessToken, refreshToken }: LogoutDto
   ): Promise<LogoutResponse> {
     try {
-      await this.userToken.invalidate(userId, tokenId);
-      await this.blackList.setToBlackList(token);
+      const payload: unknown = await this.refreshTokenService.verify(refreshToken)
+      const validObj = plainToInstance(RefreshTokenPayload, payload)
+      await validateOrReject(validObj, { whitelist: true })
+      const { id, tokenId } = validObj;
+      // invalidate refreshToken
+      await this.userToken.invalidate(id, tokenId);
+      // set accessToken to Blacklist
+      await this.blackList.setToBlackList(accessToken);
       return {
         message: 'user logout successfully',
       };
     } catch (err) {
-      this.logger.error(err);
-      throw new InternalServerErrorException();
+      this.logger.warn(err)
+      throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN)
     }
   }
 }

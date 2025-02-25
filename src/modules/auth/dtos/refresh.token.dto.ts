@@ -8,7 +8,14 @@ export class RefreshTokenDto {
     @IsNotEmpty()
     refreshToken: string
 }
-
+export class LogoutDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    refreshToken: string
+    @ApiProperty()
+    @IsNotEmpty()
+    accessToken: string
+}
 export class RefreshTokenResponse implements ResponseDto {
     @Expose()
     @ApiProperty()
