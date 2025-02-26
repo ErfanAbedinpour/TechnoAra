@@ -15,6 +15,8 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ErrorMessages } from '../../../errorResponse/err.response';
 import { v4 } from 'uuid';
 import { UpdateTicketDto } from '../dto/update-ticket.dto';
+import { ChangeStatusDto } from '../dto/change-status.dto';
+import { spec } from 'node:test/reporters';
 
 describe('Ticket Service', () => {
     let service: TicketService;
@@ -192,6 +194,39 @@ describe('Ticket Service', () => {
             expect(result.id).toStrictEqual(ticket.id);
             const isTicketUpdated = await em.findOne(Ticket, ticket.id);
             expect(isTicketUpdated.status).toStrictEqual(TicketStatus.CLOSE);
+        });
+
+        describe('Change Ticket Staus', () => {
+            let ticket: Ticket;
+
+            const updatedPayload: ChangeStatusDto = {
+                status: TicketStatus.CLOSE,
+            };
+            beforeEach(async () => {
+                ticket = em.create(
+                    Ticket,
+                    {
+                        body: `test-body-1`,
+                        department: TicketDepartment.support,
+                        title: `test-title-1`,
+                        user: user.id,
+                        identify: v4(),
+                    },
+                    { persist: true },
+                );
+                await em.flush();
+            });
+
+            it('should ticket staus to be open', () => {
+                expect(ticket.status).toEqual(TicketStatus.OPEN);
+            });
+            it('should be change ticket staus', async () => {
+                const promise = service.changeStatus(ticket.id, updatedPayload);
+                expect(promise).resolves.toBeTruthy();
+                expect(await promise).toBeInstanceOf(Ticket);
+                const newTicket = await em.findOne(Ticket, ticket.id);
+                expect(newTicket.status).toEqual(TicketStatus.CLOSE);
+            });
         });
     });
 });
