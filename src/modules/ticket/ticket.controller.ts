@@ -20,6 +20,7 @@ import { TicketDto } from './dto/ticket.dto';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { ChangeStatusDto } from './dto/change-status.dto';
 
 @Controller('ticket')
 export class TicketController {
@@ -81,5 +82,15 @@ export class TicketController {
     @ApiNotFoundResponse({ description: 'ticket not found' })
     delete(@Param('id', ParseIntPipe) id: number, @GetUser('id') userId: number) {
         return this.ticketService.remove(id, userId);
+    }
+
+    // change ticket status
+    @Patch(':id/status')
+    @Role(UserRole.ADMIN)
+    changeTicketStatus(
+        @Param('id') ticketId: number,
+        @Body() changeTicketDto: ChangeStatusDto,
+    ) {
+        return this.ticketService.changeStatus(ticketId, changeTicketDto);
     }
 }

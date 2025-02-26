@@ -17,6 +17,7 @@ import { Ticket } from '../../models/ticket.model';
 import { v4 } from 'uuid';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { ChangeStatusDto } from './dto/change-status.dto';
 
 @Injectable()
 export class TicketService {
@@ -116,6 +117,19 @@ export class TicketService {
         } catch (err) {
             this.mikroOrmErrorHandler(err);
             throw new InternalServerErrorException(ErrorMessages.UNKNOWN_ERROR);
+        }
+    }
+
+    async changeStatus(ticketId: number, { status }: ChangeStatusDto) {
+        const ticket = await this.findById(ticketId);
+        try {
+            // change status
+            const newTicket = wrap(ticket).assign({ status });
+            // flush
+            await this.em.flush();
+            return newTicket;
+        } catch (err) {
+            throw new InternalServerErrorException();
         }
     }
 }
