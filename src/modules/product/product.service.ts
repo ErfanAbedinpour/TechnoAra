@@ -1,8 +1,7 @@
 import { BadRequestException, ConflictException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
+import { CreateProductDto, CreateProductResponse } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '../../models/product.model';
-import Decimal from 'decimal.js';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { DriverException, EntityManager, ForeignKeyConstraintViolationException, NotFoundError, UniqueConstraintViolationException } from '@mikro-orm/postgresql';
 import { GetAllProductResponse } from './dto/get-product';
@@ -13,6 +12,9 @@ import { QUEUES } from '../../enums/queues.enum';
 import { Queue } from 'bullmq';
 import { ProductJobName, RemoveProductImageJob, UploadProductImageJob } from './interface/job.interface';
 import { ImageJobCreator } from './job/product-file.job';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateProductCommand } from './commands/create-product.command';
+import { ProductByIdQuery } from './queries/product-by-id.query';
 
 @Injectable()
 export class ProductService {
@@ -20,17 +22,15 @@ export class ProductService {
 
   constructor(
     private readonly em: EntityManager,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
     @InjectQueue(QUEUES.PRODUCT_FILE) readonly queue: Queue
   ) { }
 
   async getProductById(id: number) {
 
     try {
-      const p = await this.em.findOneOrFail(Product, { id }, {
-        refresh: true
-      })
-
-      return p;
+      return this.queryBus.execute(new ProductByIdQuery(id))
     } catch (err) {
       this.mikroOrmErrorHandler(err)
       this.logger.error(err)
@@ -70,32 +70,16 @@ export class ProductService {
     }
   }
 
-  async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductRespone> {
-
-    const decimalPrice = new Decimal(price);
-
-
-    try {
-      const product = this.em.create(Product, {
-        category: category,
-        price: decimalPrice,
-        slug: slug,
-        inventory: inventory,
-        description: description,
-        title,
-        user: userId,
-        brand: brand
-      }, { persist: true, partial: true });
-
-      await this.em.flush();
-
-      return (product as unknown) as CreateProductRespone;
-    } catch (err) {
-      this.mikroOrmErrorHandler(err);
-      this.logger.error(err)
-      throw new InternalServerErrorException()
-
-    }
+  async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductResponse> {
+    return this.commandBus.execute(new CreateProductCommand(
+      userId,
+      title,
+      slug, inventory, description, price, category, brand
+    ))
+  } catch(err) {
+    this.mikroOrmErrorHandler(err);
+    this.logger.error(err)
+    throw new InternalServerErrorException()
   }
 
   async findAll(limit: number, page: number): Promise<GetAllProductResponse> {

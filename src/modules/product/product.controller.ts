@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
+import { CreateProductDto, CreateProductResponse } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { Role } from '../auth/decorator/role.decorator';
@@ -23,7 +23,7 @@ export class ProductController {
   @Post()
   @Role(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiCreatedResponse({ description: "product created successfully", type: CreateProductRespone })
+  @ApiCreatedResponse({ description: "product created successfully", type: CreateProductResponse })
   @ApiBadRequestResponse({ description: "slug is already taken." })
   @ApiNotFoundResponse({ description: "category or user information invalid." })
   @UseInterceptors(SlugifyInterceptor)

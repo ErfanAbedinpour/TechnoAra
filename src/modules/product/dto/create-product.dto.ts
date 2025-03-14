@@ -1,7 +1,7 @@
 import { PlainObject } from "@mikro-orm/core";
 import { ApiProperty } from "@nestjs/swagger";
 import { Expose } from "class-transformer";
-import { IsBoolean, IsDecimal, IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString, Min, MinLength } from "class-validator";
+import { IsNotEmpty, IsNumber, IsNumberString, IsString, Min, MinLength } from "class-validator";
 import Decimal from "decimal.js";
 
 
@@ -63,7 +63,7 @@ export class CreateProductDto extends PlainObject {
 }
 
 
-export class CreateProductRespone {
+export class CreateProductResponse {
     @Expose()
     @ApiProperty()
     "id": number
