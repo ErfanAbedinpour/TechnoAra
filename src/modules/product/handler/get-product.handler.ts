@@ -10,23 +10,27 @@ export class FindProductHandler implements IQueryHandler<FindProductQuery> {
     async execute({ limit, page }: FindProductQuery): Promise<GetAllProductResponse> {
         const offset = (page - 1) * limit;
 
-        const [products, count] = await this.em.findAndCount(Product, { inventory: { $gte: 1 } }, {
-            limit: limit,
-            offset,
-            fields: ["category.title", "user.username", "title", "slug", "price", "inventory", "brand.name"],
-            populate: ['category', 'brand', 'images.isTitle', 'images.src'],
-            orderBy: { id: "asc" }
-        })
+        try {
+            const [products, count] = await this.em.findAndCount(Product, { inventory: { $gte: 1 } }, {
+                limit: limit,
+                offset,
+                fields: ["category.title", "user.username", "title", "slug", "price", "inventory", "brand.name"],
+                populate: ['category', 'brand', 'images.isTitle', 'images.src'],
+                orderBy: { id: "asc" }
+            })
 
-        return {
-            products,
-            meta: {
-                countAll: count,
-                count: products.length,
-                allPages: Math.ceil(count / limit) || 1,
-                page,
-            }
-        };
+            return {
+                products,
+                meta: {
+                    countAll: count,
+                    count: products.length,
+                    allPages: Math.ceil(count / limit) || 1,
+                    page,
+                }
+            };
 
+        } catch (err) {
+            throw err
+        }
     }
 }

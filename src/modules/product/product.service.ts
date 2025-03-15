@@ -16,6 +16,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateProductCommand } from './commands/create-product.command';
 import { ProductByIdQuery } from './queries/product-by-id.query';
 import { FindProductQuery } from './queries/get-product.query';
+import { UpdateProductCommand } from './commands/update-product.command';
 
 @Injectable()
 export class ProductService {
@@ -92,10 +93,10 @@ export class ProductService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(slug: string) {
     try {
       // find product and join brand and category and orders and comments
-      const product = await this.em.findOneOrFail(Product, { id }, {
+      const product = await this.em.findOneOrFail(Product, { slug }, {
         exclude: ["attributes.product", "brand.user", "images.createdAt", 'images.updatedAt'],
         populate: ['comments', "attributes", "brand", 'category', 'orders', 'images'],
         orderBy: { id: "asc" }
@@ -111,58 +112,8 @@ export class ProductService {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const product = await this.getProductById(id);
-    //validate product
     try {
-
-      /*
-        user send product attribute like this 
-        size 13ich
-        ram 6GB
-        ....
-        if this attribute exsist in Db append them to productAttribute Table 
-        and if not exsist create them.
-       */
-      /*
-        store attributes and productAttributes into array 
-        and insert whole them at once for decrease IO 
-       */
-      const attributes: Attribute[] = [];
-      const productAttributes: ProductAttribute[] = [];
-
-      if (updateProductDto.attributes) {
-
-        for (const { name, value } of updateProductDto.attributes) {
-          // create instance of attribute
-          const attribute = this.em.create(Attribute, { name, createdAt: Date.now(), updatedAt: Date.now() });
-
-          // push attribute into list for whole at once
-          attributes.push(attribute);
-          productAttributes.push({ attribute, value, product: product });
-        }
-      }
-
-      for (const [prop, value] of Object.entries(updateProductDto)) {
-        if (prop !== "attributes" && value && product[prop] !== value) {
-          this.em.assign(product, { [prop]: value });
-        }
-      }
-
-      // upsert attributes 
-      await this.em.upsertMany(
-        Attribute,
-        attributes,
-        { onConflictFields: ['name'], onConflictAction: "ignore" })
-
-      await Promise.all([
-        this.em.upsertMany(
-          ProductAttribute,
-          productAttributes,
-          { onConflictFields: ["attribute", "product"], onConflictAction: "merge", onConflictMergeFields: ["value"] }),
-        this.em.flush()
-      ])
-
-      return product
+      return this.commandBus.execute(new UpdateProductCommand(id, updateProductDto))
     } catch (err) {
       this.mikroOrmErrorHandler(err);
       this.logger.error(err)
