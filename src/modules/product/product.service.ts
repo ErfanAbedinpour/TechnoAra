@@ -15,6 +15,7 @@ import { ImageJobCreator } from './job/product-file.job';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateProductCommand } from './commands/create-product.command';
 import { ProductByIdQuery } from './queries/product-by-id.query';
+import { FindProductQuery } from './queries/get-product.query';
 
 @Injectable()
 export class ProductService {
@@ -83,26 +84,8 @@ export class ProductService {
   }
 
   async findAll(limit: number, page: number): Promise<GetAllProductResponse> {
-    const offset = (page - 1) * limit;
-
     try {
-      const [products, count] = await this.em.findAndCount(Product, { inventory: { $gte: 1 } }, {
-        limit: limit,
-        offset,
-        fields: ["category.title", "user.username", "title", "slug", "price", "inventory", "brand.name"],
-        populate: ['category', 'brand', 'images.isTitle', 'images.src'],
-        orderBy: { id: "asc" }
-      })
-
-      return {
-        products,
-        meta: {
-          countAll: count,
-          count: products.length,
-          allPages: Math.ceil(count / limit) || 1,
-          page,
-        }
-      };
+      return this.queryBus.execute(new FindProductQuery(limit, page))
     } catch (err) {
       this.logger.error(err)
       throw new InternalServerErrorException()
