@@ -67,17 +67,26 @@ export class AddressService {
   }
 
 
-  async update(addressId: number, updateAddressDto: UpdateAddressDto) {
+  async findOne(id: number, userId: number): Promise<AddressDto> {
+    try {
+      const resp = await this.em.findOneOrFail(Address, { id, user: userId }, { exclude: ["user", 'createdAt', 'updatedAt'], populate: ['city'] });
+      return resp
+    } catch (err) {
+      this.errorHandler(err)
+      this.logger.error(err)
+      throw new InternalServerErrorException()
+    }
+  }
+
+
+  async update(addressId: number, updateAddressDto: UpdateAddressDto): Promise<AddressDto> {
 
     const address = await this.em.findOne(Address, { id: addressId });
 
     if (!address)
       throw new NotFoundException(ErrorMessages.ADDRESS_NOT_FOUND)
 
-    if (updateAddressDto.city_slug || updateAddressDto.province_slug) {
-
-      if (!updateAddressDto.province_slug || !updateAddressDto.city_slug)
-        throw new BadRequestException(`${ErrorMessages.PROVINCE_EMPTY} or ${ErrorMessages.CITY_EMPTY}`);
+    if (updateAddressDto.city_slug && updateAddressDto.province_slug) {
 
       // find user City
       const userCity = await this.cityService.getCity(updateAddressDto.province_slug, updateAddressDto.city_slug)
@@ -85,7 +94,7 @@ export class AddressService {
       address.city = userCity;
     }
 
-    // updated value in address if value in dto is exsist
+    // updated value in address if value in dto is exist 
     for (const key in updateAddressDto) {
       if (key !== 'city' && key !== 'province') {
         address[key] = updateAddressDto[key];
@@ -94,7 +103,14 @@ export class AddressService {
 
     try {
       await this.em.flush();
-      return address
+
+      return {
+        id: address.id,
+        city: address.city,
+        postal_code: address.postal_code,
+        street: address.street
+      }
+
     } catch (err) {
       this.errorHandler(err)
       this.logger.error(err)
@@ -102,12 +118,12 @@ export class AddressService {
     }
   }
 
-  async remove(addressId: number) {
+  async remove(addressId: number): Promise<AddressDto> {
 
     try {
       const address = await this.em.findOneOrFail(Address, { id: addressId });
       await this.em.removeAndFlush(address);
-      return address
+      return { id: address.id, city: address.city, postal_code: address.postal_code, street: address.street }
     } catch (err) {
       this.errorHandler(err)
       this.logger.error(err)
