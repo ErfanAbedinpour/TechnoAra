@@ -1,4 +1,4 @@
 export enum DirectoryName {
-    USER_PROFILE = "user_profile",
-    PRODUCT = "product"
+    USER_PROFILE = "profiles",
+    PRODUCT = "products"
 }

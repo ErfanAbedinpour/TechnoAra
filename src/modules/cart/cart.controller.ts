@@ -20,7 +20,7 @@ import { CartDto, ProductDto } from './dto/create-cart-response';
 
 
 @Controller('cart')
-@ApiBearerAuth()
+@ApiBearerAuth("JWT_AUTH")
 @ApiExtraModels(CartDto, ProductDto)
 export class CartController {
   constructor(private readonly cartService: CartService) { }

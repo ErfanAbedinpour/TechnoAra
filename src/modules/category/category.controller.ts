@@ -31,7 +31,7 @@ import { ResponseStructure } from '../../decorator/resposne-stucture.decorator';
 @Role(UserRole.ADMIN)
 @UseInterceptors(SlugifyInterceptor)
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
   @Post()
   @ApiCreatedResponse({
@@ -40,7 +40,7 @@ export class CategoryController {
   })
   @ApiBadRequestResponse({ description: 'category slug is used before' })
   @ResponseStructure(CategoryResponse)
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   create(
     @GetUser('id') userId: number,
     @Body() createCategoryDto: CreateCategoryDto,
@@ -67,7 +67,7 @@ export class CategoryController {
   })
   @ApiNotFoundResponse({ description: 'category not found' })
   @ResponseStructure(UpdateCategoryResponse)
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT_AUTH')
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -79,7 +79,7 @@ export class CategoryController {
   @Delete(':id')
   @ApiOkResponse({ description: 'category removed successfully' })
   @ApiNotFoundResponse({ description: 'category not found' })
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   remove(@Param('id') id: string) {
     return this.categoryService.remove(+id);
   }

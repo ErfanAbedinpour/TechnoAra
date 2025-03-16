@@ -3,12 +3,12 @@ import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
-import { ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
 import { Address } from '../../models/address.model';
-import { ResponseSerializerInterceptor } from '../../interceptor/response-serializer.interceptor';
 import { ResponseStructure } from '../../decorator/resposne-stucture.decorator';
 
 @Controller('address')
+@ApiBearerAuth("JWT_AUTH")
 export class AddressController {
   constructor(private readonly addressService: AddressService) { }
 

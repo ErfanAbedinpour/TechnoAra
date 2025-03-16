@@ -21,7 +21,7 @@ export class ProductController {
 
   @Post()
   @Role(UserRole.ADMIN)
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   @ApiCreatedResponse({ description: "product created successfully", type: CreateProductResponse })
   @ApiBadRequestResponse({ description: "slug is already taken." })
   @ApiNotFoundResponse({ description: "category or user information invalid." })
@@ -47,7 +47,7 @@ export class ProductController {
 
   @ApiOkResponse({ description: "product updated successfully", type: UpdateProductDto })
   @ApiNotFoundResponse({ description: "Product not found" })
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   @Patch(':id')
   @Role(UserRole.ADMIN)
   @UseInterceptors(SlugifyInterceptor)
@@ -59,7 +59,7 @@ export class ProductController {
   @ApiOkResponse({ description: "attribute remvoe successfully" })
   @ApiNotFoundResponse({ description: "Product not found" })
   @ApiBadRequestResponse({ description: "attribute not found" })
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   @Delete(":id/:attrName")
   @Role(UserRole.ADMIN)
   removeAttribute(@Param("id", ParseIntPipe) id: number, @Param("attrName") attrName: string) {
@@ -68,7 +68,7 @@ export class ProductController {
 
   @ApiOkResponse({ description: "product remove successfully" })
   @ApiNotFoundResponse({ description: "product not found" })
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   @Delete(':id')
   @Role(UserRole.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {

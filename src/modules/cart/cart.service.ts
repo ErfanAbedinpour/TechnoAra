@@ -24,7 +24,7 @@ export class CartService {
       const userCart = await this.em.findOne(Cart, { user: userId })
 
       let userCartProduct = await this.em.findOne(CartProduct, { $and: [{ cart: userCart }, { product: productId }] }, { populate: ['product', 'cart'] })
-      // if product does not exsist in user Cart Add them
+      // if product does not exist in user Cart Add them
       if (!userCartProduct)
         userCartProduct = this.em.create(CartProduct, { cart: userCart, product: productId, count: 1 }, { persist: true })
 

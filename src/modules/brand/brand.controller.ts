@@ -13,7 +13,7 @@ import { RemoveBrandResponse } from './dto/remove-brand.dto';
 @Controller('brand')
 @Role(UserRole.ADMIN)
 @ApiTags("brand")
-@ApiBearerAuth()
+@ApiBearerAuth("JWT_AUTH")
 export class BrandController {
   constructor(private readonly brandService: BrandService) { }
 
