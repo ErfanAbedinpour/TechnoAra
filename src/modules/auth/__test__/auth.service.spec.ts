@@ -28,11 +28,14 @@ describe("auth service", function () {
 	beforeAll(async () => {
 		const moduelRef = await Test.createTestingModule({
 			imports: [
-				BullModule.registerQueue({ name: QUEUES.WELCOME_EMAIL }),
 				MikroOrmModule.forRoot(DB_TEST_CONFIG),
 			],
 			providers: [
 				AuthService,
+				{
+					provide: "BullQueue_welcome-email",
+					useValue: { add: jest.fn() }
+				},
 				{
 					provide: HashService,
 					useClass: ArgonService,
@@ -116,12 +119,12 @@ describe("auth service", function () {
 			)
 			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(false)
 
-			const resPromise = authService.token({ refreshToken: "" });
+			const resPromise = authService.token({ refreshToken: "", accessToken: "" });
 			expect(resPromise).rejects.toThrow(UnauthorizedException)
 			expect(resPromise).rejects.toThrow(ErrorMessages.INVALID_REFRESH_TOKEN);
 		})
 
-		it("should be throw badRequest if user not found", () => {
+		it("should be throw BadRequest if user not found", () => {
 			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValue(
 				{
 					tokenId: "",
@@ -130,13 +133,14 @@ describe("auth service", function () {
 			)
 			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(true)
 			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true)
-			const resPromise = authService.token({ refreshToken: "" });
+			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce()
+			const resPromise = authService.token({ refreshToken: "", accessToken: "" });
 
 			expect(resPromise).rejects.toThrow(BadRequestException)
 			expect(resPromise).rejects.toThrow(ErrorMessages.USER_NOT_FOUND);
 		})
 
-		it("should be pass and reutrn new tokens", () => {
+		it("should be pass and return new tokens", () => {
 			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValueOnce(
 				{
 					tokenId: "",
@@ -152,7 +156,9 @@ describe("auth service", function () {
 
 			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValue(true)
 
-			const resPromise = authService.token({ refreshToken: "this is my" });
+			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce()
+
+			const resPromise = authService.token({ refreshToken: "this is my", accessToken: "" });
 
 			expect(resPromise).resolves.toBeTruthy();
 			expect(resPromise).resolves.toStrictEqual({
@@ -164,11 +170,11 @@ describe("auth service", function () {
 
 
 	describe("logout User", () => {
-		it("shoud be logout", () => {
+		it("should be logout", () => {
 			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true)
 			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce()
 
-			expect(authService.logout("", 2, "")).resolves.toStrictEqual({
+			expect(authService.logout({ accessToken: "", refreshToken: "" })).resolves.toStrictEqual({
 				message: "user logout successfully"
 			})
 
