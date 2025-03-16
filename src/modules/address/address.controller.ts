@@ -3,17 +3,19 @@ import { AddressService } from './address.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
-import { ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
 import { Address } from '../../models/address.model';
 import { ResponseStructure } from '../../decorator/resposne-stucture.decorator';
+import { HttpExceptionDto } from '../../dtos/http-exception.dto';
+import { AddressDto } from './dto/address.dto';
 
 @Controller('address')
 @ApiBearerAuth("JWT_AUTH")
 export class AddressController {
   constructor(private readonly addressService: AddressService) { }
 
-  @ApiCreatedResponse({ description: "address created successfully", type: Address })
-  @ResponseStructure(Address)
+  @ApiBody({ type: CreateAddressDto })
+  @ApiCreatedResponse({ description: "address added successfully", type: AddressDto })
   @Post()
   create(@GetUser('id') userId: number, @Body() createAddressDto: CreateAddressDto) {
     return this.addressService.create(userId, createAddressDto);
@@ -21,7 +23,9 @@ export class AddressController {
 
 
   @Get()
-  findOne(@GetUser('id') userId: number) {
+  @ApiOkResponse({ description: "fetch addresses successful", type: [AddressDto] })
+  @ApiNotFoundResponse({ description: "address not found", type: HttpExceptionDto })
+  findAddresses(@GetUser('id') userId: number) {
     return this.addressService.getUserAddresses(userId);
   }
 

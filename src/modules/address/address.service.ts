@@ -3,9 +3,9 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { EntityManager, NotFoundError } from '@mikro-orm/postgresql';
 import { Address } from '../../models/address.model';
-import { City } from '../../models/city.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { CityService } from '../province/city/city.service';
+import { AddressDto } from './dto/address.dto';
 
 @Injectable()
 export class AddressService {
@@ -22,7 +22,7 @@ export class AddressService {
     throw err;
   }
 
-  async create(userId: number, { postal_code, city_slug, province_slug, street }: CreateAddressDto) {
+  async create(userId: number, { postal_code, city_slug, province_slug, street }: CreateAddressDto): Promise<AddressDto> {
 
     // find user City
     const userCity = await this.cityService.getCity(province_slug, city_slug);
@@ -40,7 +40,14 @@ export class AddressService {
 
     try {
       await this.em.persistAndFlush(address);
-      return address
+
+      return {
+        id: address.id,
+        city: address.city,
+        postal_code: address.postal_code,
+        street: address.street
+      }
+
     } catch (err) {
       this.logger.error(err)
       throw new InternalServerErrorException()
@@ -52,7 +59,8 @@ export class AddressService {
     const addresses = await this.em.findAll(
       Address, {
       where: { user: userId },
-      populate: ["city"]
+      populate: ["city"],
+      exclude: ["createdAt", "updatedAt", 'user'],
     });
 
     return addresses

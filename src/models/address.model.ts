@@ -8,15 +8,12 @@ import { ApiProperty } from "@nestjs/swagger";
 
 @Entity({ tableName: "addresses" })
 export class Address extends BaseEntity {
-    @ApiProperty({ description: "postal_code" })
     @Property()
     postal_code!: string
 
-    @ApiProperty({ description: "address" })
     @Property({ type: 'text' })
     street!: string
 
-    @ApiProperty({ description: "city", type: City })
     @OneToOne(() => City, { owner: true, unique: false })
     city!: Rel<City>
 
