@@ -5,7 +5,6 @@ import { Product } from '../../models/product.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { DriverException, EntityManager, ForeignKeyConstraintViolationException, NotFoundError, UniqueConstraintViolationException } from '@mikro-orm/postgresql';
 import { GetAllProductResponse } from './dto/get-product';
-import { Attribute } from '../../models/attribute.model';
 import { ProductAttribute } from '../../models/product-attribute.model';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QUEUES } from '../../enums/queues.enum';

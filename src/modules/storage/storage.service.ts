@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { S3Storage } from './storages/s3-storage.service';
-import { FilePayload } from './storages/storage.abstract';
+import { FilePayload, Storage } from './storages/storage.abstract';
 
 @Injectable()
 export class StorageService {
-    constructor(private readonly s3Service: S3Storage) { }
+    constructor(private readonly service: Storage) { }
 
     async get(key: string): Promise<string> {
         try {
-            const result = await this.s3Service.get(key);
+            const result = await this.service.get(key);
             return result
         } catch (e) {
             throw e;
@@ -16,9 +15,9 @@ export class StorageService {
     }
 
 
-    async remove(key: string): Promise<string> {
+    async remove(key: string): Promise<boolean> {
         try {
-            return this.s3Service.remove(key);
+            return this.service.remove(key);
         } catch (e) {
             throw e
         }
@@ -26,7 +25,7 @@ export class StorageService {
 
     upload(payLoad: FilePayload): Promise<string> {
         try {
-            return this.s3Service.upload(payLoad);
+            return this.service.upload(payLoad);
         } catch (e) {
 
             throw e;

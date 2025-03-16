@@ -1,4 +1,4 @@
-export enum AwsFolderName {
+export enum DirectoryName {
     USER_PROFILE = "user_profile",
     PRODUCT = "product"
 }
