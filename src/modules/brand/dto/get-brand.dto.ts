@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { BrandDto } from "./create-brand.dto";
+import { BrandDto } from "./brand.dto";
 
 export class FindOneBrandResponse extends BrandDto { }
 
