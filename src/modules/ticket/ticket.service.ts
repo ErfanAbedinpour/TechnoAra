@@ -72,7 +72,8 @@ export class TicketService {
                 department: ticket.department,
                 identify: ticket.identify,
                 status: ticket.status,
-                title: ticket.title
+                title: ticket.title,
+                createdAt: ticket.createdAt
             };
         } catch (e) {
             this.mikroOrmErrorHandler(e);
@@ -95,15 +96,16 @@ export class TicketService {
     }
 
     // update Ticket
-    async update(updateDto: UpdateTicketDto, id: string, userId: number) {
+    async update(updateDto: UpdateTicketDto, id: string, userId: number): Promise<TicketDto> {
         try {
             const ticket = await this.em.findOneOrFail(Ticket, { user: userId, identify: id });
-
             const newTicket = wrap(ticket).assign(updateDto);
             await this.em.flush();
-            return newTicket;
+            return newTicket
         } catch (err) {
             this.mikroOrmErrorHandler(err);
+            this.logger.error(err)
+            throw new InternalServerErrorException(err)
         }
     }
 

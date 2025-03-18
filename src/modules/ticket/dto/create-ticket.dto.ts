@@ -14,7 +14,9 @@ export class CreateTicketDto {
     @IsString()
     body: string
 
+    @ApiProperty({ enum: () => TicketDepartment })
     @IsEnum(TicketDepartment)
     @IsString()
     department: TicketDepartment
+
 }

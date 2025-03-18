@@ -12,6 +12,9 @@ export class TicketDto {
     status: TicketStatus
     @ApiProperty({ enum: () => TicketDepartment, description: "ticket department" })
     department: TicketDepartment
-    @ApiProperty({ description: "ticket uuid" })
+    @ApiProperty({ description: "Ticket uuid" })
     identify: string
+
+    @ApiProperty({ description: "created Type(timestamp)" })
+    createdAt: number
 }

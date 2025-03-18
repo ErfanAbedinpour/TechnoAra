@@ -156,12 +156,7 @@ export class AuthService {
     refreshToken,
   }: LogoutDto): Promise<LogoutResponse> {
     try {
-<<<<<<< HEAD
-      const { id, tokenId } =
-        await this.refreshTokenService.verify(refreshToken);
-=======
       const { id, tokenId }: RefreshTokenPayload = await this.refreshTokenService.verify(refreshToken)
->>>>>>> develop
       // invalidate refreshToken
       await this.userToken.invalidate(id, tokenId);
       // set accessToken to Blacklist
@@ -170,15 +165,8 @@ export class AuthService {
         message: 'user logout successfully',
       };
     } catch (err) {
-<<<<<<< HEAD
-      console.log(err);
-      this.logger.warn(err);
-      throw new UnauthorizedException(err.message);
-=======
       this.logger.error(err)
       throw new InternalServerErrorException()
-
->>>>>>> develop
     }
   }
 }
