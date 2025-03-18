@@ -8,12 +8,10 @@ export class TicketDto {
     title: string;
     @ApiProperty({ description: "ticket body" })
     body: string
-    @ApiProperty({ description: "ticket status" })
+    @ApiProperty({ enum: () => TicketStatus, description: "ticket status" })
     status: TicketStatus
-    @ApiProperty({ description: "ticket department" })
+    @ApiProperty({ enum: () => TicketDepartment, description: "ticket department" })
     department: TicketDepartment
     @ApiProperty({ description: "ticket uuid" })
     identify: string
-    @ApiProperty({ description: "ticket user" })
-    user: number
 }

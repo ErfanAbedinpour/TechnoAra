@@ -9,7 +9,6 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import {
     ConstraintViolationException,
     EntityManager,
-    Loaded,
     NotFoundError,
     wrap,
 } from '@mikro-orm/postgresql';
@@ -17,7 +16,7 @@ import { Ticket } from '../../models/ticket.model';
 import { v4 } from 'uuid';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
-import { ChangeStatusDto } from './dto/change-status.dto';
+import { TicketDto } from './dto/ticket.dto';
 
 @Injectable()
 export class TicketService {
@@ -33,16 +32,30 @@ export class TicketService {
             throw new NotFoundException(ErrorMessages.TICKET_NOT_FOUND);
     }
 
-    private async findById(id: number) {
+    // getTicketBy Identifier
+    async getTicketByIdentify(id: string) {
         try {
-            const ticket = await this.em.findOneOrFail(Ticket, id);
+            const ticket = await this.em.findOneOrFail(Ticket, { identify: id });
             return ticket;
         } catch (err) {
             this.mikroOrmErrorHandler(err);
         }
     }
 
-    async create({ body, department, title }: CreateTicketDto, userId: number) {
+
+    // get userTicketById
+    async getUserTicketById(identify: string, userId: number) {
+        try {
+            const ticket = await this.em.findOneOrFail(Ticket, { identify, user: userId }, { exclude: ["user", "updatedAt"] })
+            return ticket
+        } catch (err) {
+            this.mikroOrmErrorHandler(err)
+            throw new InternalServerErrorException()
+        }
+    }
+
+    // create Ticket
+    async create({ body, department, title }: CreateTicketDto, userId: number): Promise<TicketDto> {
         const id = v4();
         const ticket = this.em.create(
             Ticket,
@@ -52,7 +65,15 @@ export class TicketService {
 
         try {
             await this.em.flush();
-            return ticket;
+
+            return {
+                id: ticket.id,
+                body: ticket.body,
+                department: ticket.department,
+                identify: ticket.identify,
+                status: ticket.status,
+                title: ticket.title
+            };
         } catch (e) {
             this.mikroOrmErrorHandler(e);
             this.logger.error(e);
@@ -60,26 +81,10 @@ export class TicketService {
         }
     }
 
-    async getById(id: number): Promise<Loaded<Ticket, 'user', '*', never>> {
+    // remove ticket
+    async remove(id: string, userId: number) {
         try {
-            const ticket = await this.em.findOneOrFail(Ticket, id, {
-                populate: ['user'],
-            });
-            return ticket;
-        } catch (err) {
-            this.mikroOrmErrorHandler(err);
-            throw new InternalServerErrorException(ErrorMessages.UNKNOWN_ERROR);
-        }
-    }
-
-    async getAll() {
-        const tickets = await this.em.find(Ticket, {}, { populate: ['user'] });
-        return tickets;
-    }
-
-    async remove(id: number, userId: number) {
-        try {
-            const ticket = await this.em.findOneOrFail(Ticket, { user: userId, id });
+            const ticket = await this.em.findOneOrFail(Ticket, { user: userId, identify: id });
             await this.em.removeAndFlush(ticket);
             return ticket;
         } catch (err) {
@@ -89,9 +94,10 @@ export class TicketService {
         }
     }
 
-    async update(updateDto: UpdateTicketDto, id: number, userId: number) {
+    // update Ticket
+    async update(updateDto: UpdateTicketDto, id: string, userId: number) {
         try {
-            const ticket = await this.em.findOneOrFail(Ticket, { user: userId, id });
+            const ticket = await this.em.findOneOrFail(Ticket, { user: userId, identify: id });
 
             const newTicket = wrap(ticket).assign(updateDto);
             await this.em.flush();
@@ -102,11 +108,12 @@ export class TicketService {
     }
 
     // get userTickets
-    getAllUserTicket(userId: number): Promise<Ticket[]> {
-        return this.em.find(Ticket, { user: userId });
+    getAllUserTicket(userId: number): Promise<TicketDto[]> {
+        return this.em.find(Ticket, { user: userId }, { exclude: ["user", "updatedAt"] });
     }
+
     // getUserTicket
-    async getUserTicket(userId: number, ticketId: number): Promise<Ticket> {
+    async getUserTicket(userId: number, ticketId: number): Promise<TicketDto> {
         try {
             const ticket = await this.em.findOneOrFail(Ticket, {
                 user: userId,
@@ -120,16 +127,4 @@ export class TicketService {
         }
     }
 
-    async changeStatus(ticketId: number, { status }: ChangeStatusDto) {
-        const ticket = await this.findById(ticketId);
-        try {
-            // change status
-            const newTicket = wrap(ticket).assign({ status });
-            // flush
-            await this.em.flush();
-            return newTicket;
-        } catch (err) {
-            throw new InternalServerErrorException();
-        }
-    }
 }
