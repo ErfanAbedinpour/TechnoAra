@@ -13,7 +13,7 @@ export class ZarinPalService implements Payment {
         })
     }
 
-    async getPaymentUrl({ amount, description }: { amount: number, description: string }): Promise<string> {
+    async getPaymentAuthority({ amount, description }: { amount: number; description: string; }): Promise<string> {
         // init payment 
         try {
             const resp = (await this.zarinPal.payments.create({
@@ -23,11 +23,14 @@ export class ZarinPalService implements Payment {
             })) as ICreatePayment;
 
             const { authority } = resp.data
-            const url = this.zarinPal.payments.getRedirectUrl(authority);
-            return url
+            return authority
         } catch (err) {
             throw err;
         }
+    }
+
+    getPaymentUrl(authority: string): string {
+        return this.zarinPal.payments.getRedirectUrl(authority)
     }
 
     async verify(authority: string, amount: number) {

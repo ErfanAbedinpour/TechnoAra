@@ -3,24 +3,21 @@ import { Auth, AUTH_STRATEGIES } from "../auth/decorator/auth.decorator";
 import { TransactionDto } from "./dto/newTransaction.dto";
 import { PaymentService } from "./payment.service";
 import { CallBackDto } from "./dto/callback.query.dto";
-import { PaymentMethod } from "./enums/payment-method.enum";
+import { GetUser } from "../auth/decorator/get-user.decorator";
 
 @Controller("payment")
-@Auth(AUTH_STRATEGIES.NONE)
 export class PaymentController {
     constructor(private readonly paymentService: PaymentService) { }
 
     @Post()
-    newTransaction(@Body() transactionDto: TransactionDto) {
-        return this.paymentService.newTransaction(transactionDto)
+    @Auth(AUTH_STRATEGIES.BEARER)
+    newTransaction(@Body() transactionDto: TransactionDto, @GetUser("id") userId: number) {
+        return this.paymentService.requestPayment(transactionDto, userId)
     }
-
-    @Get()
-    getTransactions() { }
 
     @Get("callback/zarinpal")
     callBackZarinpal(@Query() { Authority, Status }: CallBackDto) {
-        return this.paymentService.verify(Authority, Status, PaymentMethod.ZarinPal)
+        return this.paymentService.verify(Authority, Status)
     }
 
 }

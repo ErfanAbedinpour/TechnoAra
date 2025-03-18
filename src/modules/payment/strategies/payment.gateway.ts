@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Payment } from "../abstract/payment.abstract";
 import { PaymentMethod } from "../enums/payment-method.enum";
 import { ZarinPalService } from "./zarinpal.service";
+import { Providers } from "../../../models/payment.model";
 
 @Injectable()
 export class PaymentGateway {
@@ -9,11 +10,11 @@ export class PaymentGateway {
     constructor(private zarinPalService: ZarinPalService) {
         // register another payment method here
         this.paymentContainer = {
-            [PaymentMethod.ZarinPal]: this.zarinPalService
+            [Providers.ZARINPAL]: this.zarinPalService
         }
     }
 
-    getPayment(method: PaymentMethod): Payment {
+    getPayment(method: Providers): Payment {
         return this.paymentContainer[method]
     }
 }
