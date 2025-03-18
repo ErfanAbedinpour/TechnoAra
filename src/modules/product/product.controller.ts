@@ -1,19 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseInterceptors, UploadedFiles } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
+import { CreateProductDto, CreateProductResponse } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { GetUser } from '../auth/decorator/get-user.decorator';
 import { Role } from '../auth/decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam } from '@nestjs/swagger';
 import { Pagination } from '../../types/paggination.type';
 import { GetAllProductResponse } from './dto/get-product';
 import { SlugifyInterceptor } from '../../interceptor/slugify.interceptor';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '../../pipes/file-size.pipe';
-import { Auth, AUTH_STRATEGIES } from '../auth/decorator/auth.decorator';
 import { FileMimeValidationPipe } from '../../pipes/file-mime.pipe';
-import { IPrdouctImage } from './dto/product-image.type';
+import { IProductImage } from './dto/product-image.type';
 import { FileKeysValidationPipe } from '../../pipes/file-keys.pipe';
 
 @Controller('product')
@@ -22,8 +21,8 @@ export class ProductController {
 
   @Post()
   @Role(UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiCreatedResponse({ description: "product created successfully", type: CreateProductRespone })
+  @ApiBearerAuth("JWT_AUTH")
+  @ApiCreatedResponse({ description: "product created successfully", type: CreateProductResponse })
   @ApiBadRequestResponse({ description: "slug is already taken." })
   @ApiNotFoundResponse({ description: "category or user information invalid." })
   @UseInterceptors(SlugifyInterceptor)
@@ -37,17 +36,18 @@ export class ProductController {
     return this.productService.findAll(limit, page);
   }
 
-  @Get(":id")
+  @Get(":slug")
+  @ApiParam({ name: "slug" })
   @ApiOkResponse({ description: "product fetched successfully" })
   @ApiNotFoundResponse({ description: "product not found" })
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productService.findOne(id);
+  findOne(@Param('slug') slug: string) {
+    return this.productService.findOne(slug);
   }
 
 
   @ApiOkResponse({ description: "product updated successfully", type: UpdateProductDto })
   @ApiNotFoundResponse({ description: "Product not found" })
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   @Patch(':id')
   @Role(UserRole.ADMIN)
   @UseInterceptors(SlugifyInterceptor)
@@ -59,7 +59,7 @@ export class ProductController {
   @ApiOkResponse({ description: "attribute remvoe successfully" })
   @ApiNotFoundResponse({ description: "Product not found" })
   @ApiBadRequestResponse({ description: "attribute not found" })
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   @Delete(":id/:attrName")
   @Role(UserRole.ADMIN)
   removeAttribute(@Param("id", ParseIntPipe) id: number, @Param("attrName") attrName: string) {
@@ -68,7 +68,7 @@ export class ProductController {
 
   @ApiOkResponse({ description: "product remove successfully" })
   @ApiNotFoundResponse({ description: "product not found" })
-  @ApiBearerAuth()
+  @ApiBearerAuth("JWT_AUTH")
   @Delete(':id')
   @Role(UserRole.ADMIN)
   remove(@Param('id', ParseIntPipe) id: number) {
@@ -91,10 +91,10 @@ export class ProductController {
   ]))
   saveImages(@Param('id', ParseIntPipe) productId: number, @UploadedFiles(
     new FileKeysValidationPipe(['main', 'product_gallery']),
-    new FileSizeValidationPipe<IPrdouctImage>(["main", "product_gallery"]),
-    new FileMimeValidationPipe<IPrdouctImage>(["main", "product_gallery"], ['image/jpeg', 'image/png'])
+    new FileSizeValidationPipe<IProductImage>(["main", "product_gallery"]),
+    new FileMimeValidationPipe<IProductImage>(["main", "product_gallery"], ['image/jpeg', 'image/png'])
   )
-  files: IPrdouctImage) {
+  files: IProductImage) {
     return this.productService.saveImages(productId, files);
   }
 }

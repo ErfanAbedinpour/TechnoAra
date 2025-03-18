@@ -27,11 +27,14 @@ describe('auth service', function() {
 	beforeAll(async () => {
 		const moduelRef = await Test.createTestingModule({
 			imports: [
-				BullModule.registerQueue({ name: QUEUES.WELCOME_EMAIL }),
 				MikroOrmModule.forRoot(DB_TEST_CONFIG),
 			],
 			providers: [
 				AuthService,
+				{
+					provide: "BullQueue_welcome-email",
+					useValue: { add: jest.fn() }
+				},
 				{
 					provide: HashService,
 					useClass: ArgonService,
@@ -129,11 +132,27 @@ describe('auth service', function() {
 			});
 			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(false);
 
+<<<<<<< HEAD
 			const resPromise = authService.token({ refreshToken: '' });
 			expect(resPromise).rejects.toThrow(UnauthorizedException);
+=======
+	describe("get token", () => {
+		it("return error if refreshToken invalid", async () => {
+			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValueOnce(
+				{
+					tokenId: "",
+					id: 0
+				}
+			)
+			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(false)
+
+			const resPromise = authService.token({ refreshToken: "", accessToken: "" });
+			expect(resPromise).rejects.toThrow(UnauthorizedException)
+>>>>>>> develop
 			expect(resPromise).rejects.toThrow(ErrorMessages.INVALID_REFRESH_TOKEN);
 		});
 
+<<<<<<< HEAD
 		it('should be throw badRequest if user not found', () => {
 			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValueOnce({
 				tokenId: '',
@@ -142,16 +161,38 @@ describe('auth service', function() {
 			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(true);
 			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true);
 			const resPromise = authService.token({ refreshToken: '' });
+=======
+		it("should be throw BadRequest if user not found", () => {
+			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValue(
+				{
+					tokenId: "",
+					id: 0
+				}
+			)
+			jest.spyOn(userTokenMock, 'validate').mockResolvedValueOnce(true)
+			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true)
+			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce()
+			const resPromise = authService.token({ refreshToken: "", accessToken: "" });
+>>>>>>> develop
 
 			expect(resPromise).rejects.toThrow(BadRequestException);
 			expect(resPromise).rejects.toThrow(ErrorMessages.USER_NOT_FOUND);
 		});
 
+<<<<<<< HEAD
 		it('should be pass and reutrn new tokens', () => {
 			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValueOnce({
 				tokenId: '',
 				id: 1,
 			});
+=======
+		it("should be pass and return new tokens", () => {
+			jest.spyOn(refreshTokenMock, 'verify').mockResolvedValueOnce(
+				{
+					tokenId: "",
+					id: 1
+				})
+>>>>>>> develop
 
 			jest.spyOn(userTokenMock, 'signTokens').mockResolvedValueOnce({
 				accessToken: 'some-token',
@@ -162,7 +203,13 @@ describe('auth service', function() {
 
 			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValue(true);
 
+<<<<<<< HEAD
 			const resPromise = authService.token({ refreshToken: 'this is my' });
+=======
+			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce()
+
+			const resPromise = authService.token({ refreshToken: "this is my", accessToken: "" });
+>>>>>>> develop
 
 			expect(resPromise).resolves.toBeTruthy();
 			expect(resPromise).resolves.toStrictEqual({
@@ -180,6 +227,7 @@ describe('auth service', function() {
 			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true);
 			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce();
 
+<<<<<<< HEAD
 			const promise = authService.logout({
 				refreshToken: 'refreshTOken',
 				accessToken: 'accessToken',
@@ -189,4 +237,17 @@ describe('auth service', function() {
 			});
 		});
 	});
+=======
+	describe("logout User", () => {
+		it("should be logout", () => {
+			jest.spyOn(userTokenMock, 'invalidate').mockResolvedValueOnce(true)
+			jest.spyOn(blackListMock, 'setToBlackList').mockResolvedValueOnce()
+
+			expect(authService.logout({ accessToken: "", refreshToken: "" })).resolves.toStrictEqual({
+				message: "user logout successfully"
+			})
+
+		})
+	})
+>>>>>>> develop
 });

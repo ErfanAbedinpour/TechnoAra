@@ -9,6 +9,7 @@ import { CartModule } from "../modules/cart/cart.module";
 import { AddressModule } from "../modules/address/address.module";
 import { ProvinceModule } from "../modules/province/province.module";
 import { StorageModule } from "../modules/storage/storage.module";
+import { PaymentModule } from "../modules/payment/payment.module";
 
 export const internalImports = [
     AuthModule,
@@ -22,5 +23,6 @@ export const internalImports = [
     AddressModule,
     ProvinceModule,
     StorageModule,
+    PaymentModule,
 
 ];

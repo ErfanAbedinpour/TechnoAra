@@ -121,7 +121,7 @@ export class AuthService {
     }
   }
 
-  async token({ refreshToken: token }: RefreshTokenDto) {
+  async token({ refreshToken: token, accessToken: oldAccessToken }: RefreshTokenDto) {
     try {
       let { id, tokenId } = await this.refreshTokenService.verify(token);
       const isValidate = await this.userToken.validate(id, tokenId, token);
@@ -130,6 +130,8 @@ export class AuthService {
         throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);
 
       await this.userToken.invalidate(id, tokenId);
+
+      await this.blackList.setToBlackList(oldAccessToken)
 
       const user = await this.em.findOne(User, { id: id });
 
@@ -154,8 +156,12 @@ export class AuthService {
     refreshToken,
   }: LogoutDto): Promise<LogoutResponse> {
     try {
+<<<<<<< HEAD
       const { id, tokenId } =
         await this.refreshTokenService.verify(refreshToken);
+=======
+      const { id, tokenId }: RefreshTokenPayload = await this.refreshTokenService.verify(refreshToken)
+>>>>>>> develop
       // invalidate refreshToken
       await this.userToken.invalidate(id, tokenId);
       // set accessToken to Blacklist
@@ -164,9 +170,15 @@ export class AuthService {
         message: 'user logout successfully',
       };
     } catch (err) {
+<<<<<<< HEAD
       console.log(err);
       this.logger.warn(err);
       throw new UnauthorizedException(err.message);
+=======
+      this.logger.error(err)
+      throw new InternalServerErrorException()
+
+>>>>>>> develop
     }
   }
 }

@@ -10,5 +10,5 @@ export abstract class Storage {
 
     abstract get(key: string): Promise<string>
 
-    abstract remove(key: string): Promise<string>
+    abstract remove(key: string): Promise<boolean>
 }

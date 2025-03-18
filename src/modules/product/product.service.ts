@@ -1,18 +1,21 @@
 import { BadRequestException, ConflictException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import { CreateProductDto, CreateProductRespone } from './dto/create-product.dto';
+import { CreateProductDto, CreateProductResponse } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from '../../models/product.model';
-import Decimal from 'decimal.js';
 import { ErrorMessages } from '../../errorResponse/err.response';
 import { DriverException, EntityManager, ForeignKeyConstraintViolationException, NotFoundError, UniqueConstraintViolationException } from '@mikro-orm/postgresql';
 import { GetAllProductResponse } from './dto/get-product';
-import { Attribute } from '../../models/attribute.model';
 import { ProductAttribute } from '../../models/product-attribute.model';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QUEUES } from '../../enums/queues.enum';
 import { Queue } from 'bullmq';
 import { ProductJobName, RemoveProductImageJob, UploadProductImageJob } from './interface/job.interface';
 import { ImageJobCreator } from './job/product-file.job';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateProductCommand } from './commands/create-product.command';
+import { ProductByIdQuery } from './queries/product-by-id.query';
+import { FindProductQuery } from './queries/get-product.query';
+import { UpdateProductCommand } from './commands/update-product.command';
 
 @Injectable()
 export class ProductService {
@@ -20,17 +23,15 @@ export class ProductService {
 
   constructor(
     private readonly em: EntityManager,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
     @InjectQueue(QUEUES.PRODUCT_FILE) readonly queue: Queue
   ) { }
 
   async getProductById(id: number) {
 
     try {
-      const p = await this.em.findOneOrFail(Product, { id }, {
-        refresh: true
-      })
-
-      return p;
+      return this.queryBus.execute(new ProductByIdQuery(id))
     } catch (err) {
       this.mikroOrmErrorHandler(err)
       this.logger.error(err)
@@ -70,65 +71,31 @@ export class ProductService {
     }
   }
 
-  async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductRespone> {
-
-    const decimalPrice = new Decimal(price);
-
-
-    try {
-      const product = this.em.create(Product, {
-        category: category,
-        price: decimalPrice,
-        slug: slug,
-        inventory: inventory,
-        description: description,
-        title,
-        user: userId,
-        brand: brand
-      }, { persist: true, partial: true });
-
-      await this.em.flush();
-
-      return (product as unknown) as CreateProductRespone;
-    } catch (err) {
-      this.mikroOrmErrorHandler(err);
-      this.logger.error(err)
-      throw new InternalServerErrorException()
-
-    }
+  async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductResponse> {
+    return this.commandBus.execute(new CreateProductCommand(
+      userId,
+      title,
+      slug, inventory, description, price, category, brand
+    ))
+  } catch(err) {
+    this.mikroOrmErrorHandler(err);
+    this.logger.error(err)
+    throw new InternalServerErrorException()
   }
 
   async findAll(limit: number, page: number): Promise<GetAllProductResponse> {
-    const offset = (page - 1) * limit;
-
     try {
-      const [products, count] = await this.em.findAndCount(Product, { inventory: { $gte: 1 } }, {
-        limit: limit,
-        offset,
-        fields: ["category.title", "user.username", "title", "slug", "price", "inventory", "brand.name"],
-        populate: ['category', 'brand', 'images.isTitle', 'images.src'],
-        orderBy: { id: "asc" }
-      })
-
-      return {
-        products,
-        meta: {
-          countAll: count,
-          count: products.length,
-          allPages: Math.ceil(count / limit) || 1,
-          page,
-        }
-      };
+      return this.queryBus.execute(new FindProductQuery(limit, page))
     } catch (err) {
       this.logger.error(err)
       throw new InternalServerErrorException()
     }
   }
 
-  async findOne(id: number) {
+  async findOne(slug: string) {
     try {
       // find product and join brand and category and orders and comments
-      const product = await this.em.findOneOrFail(Product, { id }, {
+      const product = await this.em.findOneOrFail(Product, { slug }, {
         exclude: ["attributes.product", "brand.user", "images.createdAt", 'images.updatedAt'],
         populate: ['comments', "attributes", "brand", 'category', 'orders', 'images'],
         orderBy: { id: "asc" }
@@ -144,58 +111,8 @@ export class ProductService {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const product = await this.getProductById(id);
-    //validate product
     try {
-
-      /*
-        user send product attribute like this 
-        size 13ich
-        ram 6GB
-        ....
-        if this attribute exsist in Db append them to productAttribute Table 
-        and if not exsist create them.
-       */
-      /*
-        store attributes and productAttributes into array 
-        and insert whole them at once for decrease IO 
-       */
-      const attributes: Attribute[] = [];
-      const productAttributes: ProductAttribute[] = [];
-
-      if (updateProductDto.attributes) {
-
-        for (const { name, value } of updateProductDto.attributes) {
-          // create instance of attribute
-          const attribute = this.em.create(Attribute, { name, createdAt: Date.now(), updatedAt: Date.now() });
-
-          // push attribute into list for whole at once
-          attributes.push(attribute);
-          productAttributes.push({ attribute, value, product: product });
-        }
-      }
-
-      for (const [prop, value] of Object.entries(updateProductDto)) {
-        if (prop !== "attributes" && value && product[prop] !== value) {
-          this.em.assign(product, { [prop]: value });
-        }
-      }
-
-      // upsert attributes 
-      await this.em.upsertMany(
-        Attribute,
-        attributes,
-        { onConflictFields: ['name'], onConflictAction: "ignore" })
-
-      await Promise.all([
-        this.em.upsertMany(
-          ProductAttribute,
-          productAttributes,
-          { onConflictFields: ["attribute", "product"], onConflictAction: "merge", onConflictMergeFields: ["value"] }),
-        this.em.flush()
-      ])
-
-      return product
+      return this.commandBus.execute(new UpdateProductCommand(id, updateProductDto))
     } catch (err) {
       this.mikroOrmErrorHandler(err);
       this.logger.error(err)

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { StorageService } from "../../storage/storage.service";
-import { AwsFolderName } from "../../storage/enums/folder-name.enum";
+import { DirectoryName } from "../../storage/enums/directory-name.enum";
 import { extname } from "path";
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { QUEUES } from "../../../enums/queues.enum";
@@ -15,7 +15,7 @@ import { ProductJobName, RemoveProductImageJob, UploadProductImageJob } from "..
 @Injectable()
 @Processor(QUEUES.PRODUCT_FILE)
 export class ProductImageProcessor extends WorkerHost {
-    private dirName = AwsFolderName.PRODUCT;
+    private dirName = DirectoryName.PRODUCT;
 
     constructor(private readonly storage: StorageService, private readonly entityManager: EntityManager) {
 
@@ -30,11 +30,12 @@ export class ProductImageProcessor extends WorkerHost {
 
             case ProductJobName.remove: {
                 const data = job.data as RemoveProductImageJob;
+                const key = data.key
                 // remove product image in cloud storage
-                const removedKey = await this.storage.remove(data.key);
+                await this.storage.remove(key);
 
                 //also remove from database
-                const productRemoveImage = em.findOne(ProductImage, { product: data.productId, src: removedKey });
+                const productRemoveImage = em.findOne(ProductImage, { product: data.productId, src: key });
 
                 if (!productRemoveImage)
                     em.removeAndFlush(productRemoveImage)

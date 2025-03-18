@@ -4,6 +4,7 @@ import { UpdateBrandDto } from './dto/update-brand.dto';
 import { EntityManager, ForeignKeyConstraintViolationException, NotFoundError, UniqueConstraintViolationException, wrap } from '@mikro-orm/postgresql';
 import { Brand } from '../../models/brand.model';
 import { ErrorMessages } from '../../errorResponse/err.response';
+import { BrandDto } from './dto/brand.dto';
 
 @Injectable()
 export class BrandService {
@@ -29,7 +30,7 @@ export class BrandService {
 
   async findById(id: number) {
     try {
-      return await this.em.findOneOrFail(Brand, id)
+      return await this.em.findOneOrFail(Brand, id, { exclude: ["createdAt", "updatedAt", 'user'] })
     } catch (err) {
       this.mikroOrmErrorHandler(err)
       this.logger.error(err)
@@ -37,12 +38,12 @@ export class BrandService {
     }
   }
 
-  async create(userId: number, { name }: CreateBrandDto) {
+  async create(userId: number, { name }: CreateBrandDto): Promise<BrandDto> {
     const brand = this.em.create(Brand, { user: userId, name });
 
     try {
       await this.em.persistAndFlush(brand);
-      return brand;
+      return { id: brand.id, name: brand.name };
     } catch (err) {
       this.mikroOrmErrorHandler(err)
       this.logger.error(err)
@@ -51,18 +52,9 @@ export class BrandService {
   }
 
   async findAll() {
-    const [brands, count] = await this.em.findAndCount(Brand, {});
+    const [brands, count] = await this.em.findAndCount(Brand, {}, { exclude: ['createdAt', 'updatedAt', 'user'] });
     return { count, brands };
   }
-
-  async findOne(id: number) {
-    // findBrand By Id
-    const brand = await this.findById(id);
-    // return brand
-    return brand
-  }
-
-
 
   async update(id: number, updateBrandDto: UpdateBrandDto) {
     // find brand 

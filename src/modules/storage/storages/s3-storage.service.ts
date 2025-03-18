@@ -1,5 +1,5 @@
 import { DeleteObjectCommand, DeleteObjectCommandOutput, GetObjectCommand, HeadObjectCommand, PutObjectAclCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import storageConfig from "../config/storage.config";
 import { ConfigType } from "@nestjs/config";
 import { FilePayload, Storage } from "./storage.abstract";
@@ -14,6 +14,7 @@ export class S3Storage implements Storage {
 
     private client: S3Client
     private bucketName: string;
+    private readonly logger = new Logger(S3Storage.name)
 
     constructor(@Inject(storageConfig.KEY) private config: ConfigType<typeof storageConfig>) {
         // config S3 Client
@@ -32,7 +33,7 @@ export class S3Storage implements Storage {
     }
 
 
-    // uplaod object into cloud storage
+    // upload object into cloud storage
     async upload({ body, key }: FilePayload): Promise<string> {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
@@ -44,16 +45,16 @@ export class S3Storage implements Storage {
             await this.client.send(command)
             return this.keyToUrl(key);
         } catch (err) {
-            console.error(err);
+            this.logger.error(err)
             throw new UnknownException(`error during upload file`);
         }
     }
 
 
-    private async isFileExsist(key: string): Promise<boolean> {
+    private async isExist(key: string): Promise<boolean> {
         try {
 
-            // check object is exsist or not
+            // check object is exist or not
             await this.client.send(new HeadObjectCommand({
                 Bucket: this.bucketName,
                 Key: key,
@@ -74,9 +75,9 @@ export class S3Storage implements Storage {
         })
 
         try {
-            const isFileExsist = await this.isFileExsist(key);
+            const isFileExist = await this.isExist(key);
 
-            if (!isFileExsist)
+            if (!isFileExist)
                 throw new FileNotFound(`${key} not found`);
 
             const url = await getSignedUrl(this.client, command)
@@ -89,15 +90,15 @@ export class S3Storage implements Storage {
     }
 
     // remove object
-    async remove(key: string): Promise<string> {
+    async remove(key: string): Promise<boolean> {
         try {
 
             const orgKey = this.urlToKey(key);
 
-            const isFileExsist = await this.isFileExsist(orgKey);
+            const isFilExist = await this.isExist(orgKey);
 
 
-            if (!isFileExsist)
+            if (!isFilExist)
                 throw new FileNotFound(`${orgKey} not found`);
 
             const deleteParam = {
@@ -107,7 +108,7 @@ export class S3Storage implements Storage {
 
             await this.client.send(new DeleteObjectCommand(deleteParam))
 
-            return key;
+            return true;
         } catch (e) {
             if (e instanceof FileNotFound)
                 throw e
