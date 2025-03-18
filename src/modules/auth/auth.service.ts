@@ -13,7 +13,10 @@ import { UserLoginDto, UserLoginResponse } from './dtos/user.login';
 import { HashService } from './hashingServices/hash.service';
 import { UserTokenService } from './tokens/user.token.service';
 import { LogoutDto, RefreshTokenDto } from './dtos/refresh.token.dto';
-import { RefreshTokenPayload, RefreshTokenService } from './tokens/refreshToken.service';
+import {
+  RefreshTokenPayload,
+  RefreshTokenService,
+} from './tokens/refreshToken.service';
 import { Role } from './decorator/role.decorator';
 import { UserRole } from '../../models/role.model';
 import { JsonWebTokenError } from '@nestjs/jwt';
@@ -37,7 +40,7 @@ export class AuthService {
     private readonly userToken: UserTokenService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly blackList: BlackListService,
-    @InjectQueue(QUEUES.WELCOME_EMAIL) readonly welcomeQueue: Queue
+    @InjectQueue(QUEUES.WELCOME_EMAIL) readonly welcomeQueue: Queue,
   ) { }
 
   async register({
@@ -53,26 +56,37 @@ export class AuthService {
       { fields: ['id', 'email'] },
     );
 
-    if (isValidEmail) throw new BadRequestException(ErrorMessages.INVALID_EMAIL);
+    if (isValidEmail)
+      throw new BadRequestException(ErrorMessages.INVALID_EMAIL);
 
     try {
       const defaultUserRole = await this.em.findOne(Role, {
         name: UserRole.USER,
       });
 
-
-      const user = this.em.create(User, {
-        username,
-        email,
-        password,
-        role: defaultUserRole,
-      }, { persist: true });
+      const user = this.em.create(
+        User,
+        {
+          username,
+          email,
+          password,
+          role: defaultUserRole,
+        },
+        { persist: true },
+      );
 
       await this.em.flush();
       const msg = `<h1> Welcome To TechnoAra </h1>
-      <h2> ${user.username} thanks for register in TechnoAra </h2>`
+      <h2> ${user.username} thanks for register in TechnoAra </h2>`;
       // send Data To Queue
-      await this.welcomeQueue.add("welcome-email", sendMailJob({ to: user.email, subject: MailSubject.WELCOME, html: msg }));
+      await this.welcomeQueue.add(
+        'welcome-email',
+        sendMailJob({
+          to: user.email,
+          subject: MailSubject.WELCOME,
+          html: msg,
+        }),
+      );
       return { success: true };
     } catch (err) {
       console.error(err);
@@ -97,7 +111,8 @@ export class AuthService {
     // generate new token for Authorization
 
     try {
-      const { accessToken, refreshToken } = await this.userToken.signTokens(user);
+      const { accessToken, refreshToken } =
+        await this.userToken.signTokens(user);
 
       return { accessToken, refreshToken } as UserLoginResponse;
     } catch (err) {
@@ -136,9 +151,10 @@ export class AuthService {
     }
   }
 
-  async logout(
-    { accessToken, refreshToken }: LogoutDto
-  ): Promise<LogoutResponse> {
+  async logout({
+    accessToken,
+    refreshToken,
+  }: LogoutDto): Promise<LogoutResponse> {
     try {
       const { id, tokenId }: RefreshTokenPayload = await this.refreshTokenService.verify(refreshToken)
       // invalidate refreshToken
@@ -151,7 +167,6 @@ export class AuthService {
     } catch (err) {
       this.logger.error(err)
       throw new InternalServerErrorException()
-
     }
   }
 }
