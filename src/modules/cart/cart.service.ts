@@ -15,23 +15,21 @@ export class CartService {
   async addProduct(userId: number, { productId }: CreateCartDto) {
 
     const product = await this.productService.getProductById(productId)
-    // if product does not have enought quantity throw Error
+    // if product does not have enough quantity throw Error
 
     if (product.inventory < 1)
       throw new BadRequestException(ErrorMessages.PRODUCT_QUANTITY)
 
     try {
-      const userCart = await this.em.findOne(Cart, { user: userId })
+      let userCartProduct = await this.em.findOne(CartProduct, { cart: { user: userId }, product }, { populate: ['product'] })
 
-      let userCartProduct = await this.em.findOne(CartProduct, { $and: [{ cart: userCart }, { product: productId }] }, { populate: ['product', 'cart'] })
-      // if product does not exist in user Cart Add them
-      if (!userCartProduct)
-        userCartProduct = this.em.create(CartProduct, { cart: userCart, product: productId, count: 1 }, { persist: true })
-
-      else if (product.inventory - userCartProduct.count >= 1) {
-        // if exsist increase Product Quantity in User Cart
+      if (!userCartProduct) {
+        const userCart = await this.em.findOne(Cart, { user: userId });
+        userCartProduct = this.em.create(CartProduct, { cart: userCart, product, count: 1 }, { persist: true })
+      }
+      else if ((product.inventory - userCartProduct.count) >= 1) {
+        // if exist increase Product Quantity in User Cart
         userCartProduct.count++;
-
       } else
         throw new BadRequestException(ErrorMessages.PRODUCT_QUANTITY)
 
@@ -54,11 +52,9 @@ export class CartService {
   }
 
 
-  async getUserCart(userId: number) {
+  getUserCartProducts(userId: number) {
     try {
-      // findAll User Cart Products
-      const userCart = await this.em.findAll(CartProduct, { where: { cart: { user: userId } }, populate: ["product"] });
-      return userCart
+      return this.em.findAll(CartProduct, { where: { cart: { user: userId } }, populate: ['product'] });
     } catch (err) {
       this.errorHandler(err)
       this.logger.error(err)
