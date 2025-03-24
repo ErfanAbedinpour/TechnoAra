@@ -83,4 +83,9 @@ export class CartService {
       throw new InternalServerErrorException()
     }
   }
+
+
+  getUserCart(userId: number) {
+    return this.em.findOne(Cart, { user: userId });
+  }
 }
