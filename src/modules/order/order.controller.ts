@@ -1,15 +1,17 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { GetUser } from '../auth/decorator/get-user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('order')
+@ApiBearerAuth("JWT_AUTH")
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly orderService: OrderService) { }
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(createOrderDto);
+  create(@GetUser('id') userId: number) {
+    return this.orderService.create(userId);
   }
 
   @Get()
