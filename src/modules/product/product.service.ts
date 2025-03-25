@@ -31,7 +31,8 @@ export class ProductService {
   async getProductById(id: number) {
 
     try {
-      return this.queryBus.execute(new ProductByIdQuery(id))
+      const res = await this.queryBus.execute(new ProductByIdQuery(id))
+      return res
     } catch (err) {
       this.mikroOrmErrorHandler(err)
       this.logger.error(err)
@@ -72,11 +73,12 @@ export class ProductService {
   }
 
   async create({ category, description, brand, inventory, price, slug, title }: CreateProductDto, userId: number): Promise<CreateProductResponse> {
-    return this.commandBus.execute(new CreateProductCommand(
+    const res = await this.commandBus.execute(new CreateProductCommand(
       userId,
       title,
       slug, inventory, description, price, category, brand
     ))
+    return res;
   } catch(err) {
     this.mikroOrmErrorHandler(err);
     this.logger.error(err)
@@ -85,7 +87,8 @@ export class ProductService {
 
   async findAll(limit: number, page: number): Promise<GetAllProductResponse> {
     try {
-      return this.queryBus.execute(new FindProductQuery(limit, page))
+      const res = await this.queryBus.execute(new FindProductQuery(limit, page))
+      return res
     } catch (err) {
       this.logger.error(err)
       throw new InternalServerErrorException()
@@ -112,7 +115,8 @@ export class ProductService {
 
   async update(id: number, updateProductDto: UpdateProductDto) {
     try {
-      return this.commandBus.execute(new UpdateProductCommand(id, updateProductDto))
+      const res = await this.commandBus.execute(new UpdateProductCommand(id, updateProductDto))
+      return res
     } catch (err) {
       this.mikroOrmErrorHandler(err);
       this.logger.error(err)

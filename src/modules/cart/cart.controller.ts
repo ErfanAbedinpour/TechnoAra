@@ -73,7 +73,7 @@ export class CartController {
     }
   })
   getCart(@GetUser('id') id: number) {
-    return this.cartService.getUserCart(id);
+    return this.cartService.getUserCartProducts(id);
   }
 
   @Delete(':productId')
@@ -118,6 +118,6 @@ export class CartController {
     }
   })
   getUserCart(@Param("userId", ParseIntPipe) userId: number) {
-    return this.cartService.getUserCart(userId)
+    return this.cartService.getUserCartProducts(userId)
   }
 }

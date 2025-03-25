@@ -119,7 +119,7 @@ describe('CartService', () => {
 
 
     it("Should be get user cart", async () => {
-      const res = service.getUserCart(user.id);
+      const res = service.getUserCartProducts(user.id);
 
       expect(res).resolves.toBeTruthy()
       expect(res).resolves.toHaveLength(2)

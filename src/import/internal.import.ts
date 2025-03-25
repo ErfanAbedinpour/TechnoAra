@@ -11,6 +11,7 @@ import { ProvinceModule } from "../modules/province/province.module";
 import { StorageModule } from "../modules/storage/storage.module";
 import { PaymentModule } from "../modules/payment/payment.module";
 import { TicketModule } from "../modules/ticket/ticket.module";
+import { OrderModule } from "../modules/order/order.module";
 
 export const internalImports = [
     AuthModule,
@@ -25,6 +26,6 @@ export const internalImports = [
     ProvinceModule,
     StorageModule,
     PaymentModule,
-    TicketModule
-
+    TicketModule,
+    OrderModule
 ];

@@ -195,8 +195,8 @@ npm run test:e2e
 - [x] Login
 - [x] Register
 - [x] AccessToken and refreshToken
-- [x] AuthGurad
-- [x] RoleGurad
+- [x] AuthGuard
+- [x] RoleGuard 
 - [x] User Create,Read,Update,Delete => CRUD
 - [x] Product
 - [x] make code Pretty By SOLID principle
@@ -205,24 +205,24 @@ npm run test:e2e
 - [x] category CRUD
 - [x] category Test
 - [x] Brand CRUD
-- [x] Storage Cloud Cofiguration
+- [x] Storage Cloud Configuration
 - [x] Adding Product Image Table And use Key for main Image and other
-- [x] Thorw an Error If Images Does not Exsist
-- [x] Uplaod Product image to Cloud storage with s3 protocol
-- [x] Using Queue for Uploadint Image to Cloud Storage
+- [x] throw an Error If Images Does not Exist
+- [x] Upload Product image to Cloud storage with s3 protocol
+- [x] Using Queue for Uploading Image to Cloud Storage
 - [x] Added Product Image into queue for uploading into Storage
 - [x] Remove Product Image when product deleted from cloud storage 
-- [ ]  Added ApiPropery Decorator into Entities 
+- [ ] Implement Refound Money If Order canceled
 - [ ] Ticket
-- [ ] dashborad
+- [ ] Dashboard
 - [ ] Search 
-- [ ] Pracing
+- [x] Pricing
 - [ ] Delete account
 - [ ] reset password
 - [ ] article
 - [ ] comment for product
 - [ ] comment for article
-- [ ] add blog or article to favirite
+- [ ] add blog or article to Favorite
 - [ ] User panel
 - [ ] orders
 - [ ] payment
